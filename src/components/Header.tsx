@@ -42,7 +42,7 @@ export default function Header({
       {/* Container chính: px-10 tạo khoảng cách lề 0.5cm mỗi bên */}
       <div className="w-full max-w-[1300px] mx-auto px-10">
         
-        {/* Phần ảnh: Chiều cao h-[240px] (đã tăng 1cm so với trước) */}
+        {/* Phần ảnh: Chiều cao h-[260px] (đã tăng 1cm so với trước) */}
         <div className="w-full pt-2">
           <img 
             src={panelImage} 
