@@ -4,8 +4,7 @@
  */
 
 import React, { useMemo } from 'react';
-// LƯU Ý QUAN TRỌNG: Hãy đảm bảo tên file chính xác là panel.jpg hoặc panel.png
-// Dựa vào lỗi build trước đó, hãy kiểm tra file thực tế của bạn.
+// LƯU Ý 1: Nếu tên file là panel.png, hãy sửa thành '../panel.png'
 import panelImage from '../panel.jpg'; 
 import { 
   BarChart3, Edit, Briefcase, Upload, Users, 
@@ -39,19 +38,17 @@ export default function Header({
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200 w-full overflow-hidden">
-      {/* Container chính: px-10 tạo khoảng cách lề 0.5cm mỗi bên */}
       <div className="w-full max-w-[1300px] mx-auto px-10">
         
-        {/* Phần ảnh: Chiều cao h-[280px] (đã tăng 1cm so với trước) */}
+        {/* Phần ảnh: Chiều cao đã chỉnh thành 270px */}
         <div className="w-full pt-2">
           <img 
             src={panelImage} 
             alt="Header Panel" 
-            className="w-full h-[240px] object-cover rounded-lg block" 
+            className="w-full h-[270px] object-cover rounded-lg block" 
           />
         </div>
         
-        {/* Phần menu: vẫn giữ px-2 để thẳng hàng với ảnh */}
         <div className="flex items-center justify-between mt-2 px-2">
           <div className="flex gap-1 overflow-x-auto no-scrollbar">
             {tabs.map((tab) => {
