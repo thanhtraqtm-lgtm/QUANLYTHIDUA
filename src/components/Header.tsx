@@ -37,51 +37,49 @@ export default function Header({
   const totalCount = submissions.length || 1;
   const submittedCount = submissions.filter(s => s.Ngay_Nop !== null).length;
   const onTimeCount = submissions.filter(s => s.Ngay_Nop !== null && (s.So_Ngay_Tre ?? 0) <= 0).length;
-  const chartBars = Array.from({ length: 40 }, () => Math.floor(Math.random() * 60) + 20);
 
   return (
-    <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-6 pt-4">
-        {/* Hàng 1: Logo, Tiêu đề Hệ thống, và Chỉ số */}
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-4">
-            <img src={logo} alt="Logo" className="h-12 w-12 object-contain" />
-            <div>
-               <h1 className="text-[15px] font-bold text-slate-950 uppercase tracking-tight">Hệ thống Phần mềm Quản lý Thi đua</h1>
-               <p className="text-[11px] font-medium text-slate-500 uppercase tracking-widest">Thống kê Tỉnh Hưng Yên</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-8 border-l border-slate-200 pl-8">
-             <div className="text-right">
-                <p className="text-[9px] font-bold text-slate-400 uppercase">Tiến độ</p>
-                <p className="text-[16px] font-black text-slate-950">{Math.round((submittedCount / totalCount) * 100)}%</p>
-             </div>
-             <div className="text-right">
-                <p className="text-[9px] font-bold text-slate-400 uppercase">Đúng hạn</p>
-                <p className="text-[16px] font-black text-sky-600">{Math.round((onTimeCount / (submittedCount || 1)) * 100)}%</p>
-             </div>
-          </div>
+    <header className="bg-white sticky top-0 z-50 shadow-[0_4px_12px_-2px_rgba(0,0,0,0.08)]">
+      {/* TẦNG 1: THƯƠNG HIỆU & TIÊU ĐỀ (Bệ vệ) */}
+      <div className="bg-slate-950 text-white px-8 py-4 flex items-center gap-6">
+        <img src={logo} alt="Logo" className="h-16 w-16 object-contain bg-white rounded-full p-1" />
+        <div>
+          <h1 className="text-[22px] font-black uppercase tracking-tight">Hệ thống Phần mềm Quản lý Thi đua</h1>
+          <p className="text-[14px] font-bold text-sky-400 uppercase tracking-widest">Thống kê Tỉnh Hưng Yên</p>
         </div>
+      </div>
 
-        {/* Đồ thị chạy ngang */}
-        <div className="flex items-end gap-[2px] h-3 w-full opacity-30 mb-2">
-            {chartBars.map((h, i) => (
-                <div key={i} className="flex-1 bg-sky-500 rounded-t-sm" style={{ height: `${h}%` }}></div>
-            ))}
+      {/* TẦNG 2: KPI & CHỨC NĂNG (Thông tin đậm đặc) */}
+      <div className="px-8 py-5 flex items-center justify-between border-b border-slate-100 bg-white">
+        <div className="flex gap-12">
+           <div>
+              <p className="text-[10px] font-bold text-slate-400 uppercase">Tiến độ hoàn thành</p>
+              <p className="text-[28px] font-black text-slate-950">{Math.round((submittedCount / totalCount) * 100)}%</p>
+           </div>
+           <div>
+              <p className="text-[10px] font-bold text-slate-400 uppercase">Đúng hạn</p>
+              <p className="text-[28px] font-black text-sky-600">{Math.round((onTimeCount / (submittedCount || 1)) * 100)}%</p>
+           </div>
         </div>
+        <div className="flex gap-4">
+           <button onClick={onResetData} className="text-[12px] font-bold text-slate-400 hover:text-red-500">Reset</button>
+           <button onClick={onLogout} className="text-[12px] font-bold text-slate-400 hover:text-red-500">Đăng xuất</button>
+           <button onClick={onExportExcel} className="px-8 py-3 bg-slate-950 text-white text-[14px] font-bold rounded-lg hover:bg-black transition-all">XUẤT EXCEL</button>
+        </div>
+      </div>
 
-        {/* Hàng 2: Menu điều hướng */}
-        <div className="flex overflow-x-auto gap-8 pt-1">
+      {/* TẦNG 3: MENU ĐIỀU HƯỚNG (Thanh thoát) */}
+      <div className="px-8 bg-slate-50 border-b border-slate-200">
+        <div className="flex items-center gap-10 h-14">
           {rawTabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
             return (
               <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 pb-3 text-[12px] font-bold transition-all border-b-2 whitespace-nowrap ${
+                className={`flex items-center gap-3 h-full text-[13px] font-bold transition-all border-b-2 ${
                   isActive ? 'border-sky-600 text-sky-700' : 'border-transparent text-slate-500 hover:text-slate-950'
                 }`}>
-                <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-sky-600' : 'text-slate-400'}`} />
+                <Icon className="w-4 h-4" />
                 {tab.label}
               </button>
             );
