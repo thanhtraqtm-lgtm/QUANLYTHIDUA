@@ -40,12 +40,12 @@ export default function Header({
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200 w-full overflow-hidden">
       <div className="w-full max-w-[1300px] mx-auto px-10">
         
-        {/* Phần ảnh: Chiều cao đã chỉnh thành 300px */}
+        {/* Phần ảnh: Chiều cao đã chỉnh thành 270px */}
         <div className="w-full pt-2">
           <img 
             src={panelImage} 
             alt="Header Panel" 
-            className="w-full h-[300px] object-cover rounded-lg block" 
+            className="w-full h-[270px] object-cover rounded-lg block" 
           />
         </div>
         
