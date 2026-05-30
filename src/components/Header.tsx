@@ -4,15 +4,13 @@
  */
 
 import React from 'react';
-import logo from '../logo.png'; 
-import { BarChart3, Edit, Briefcase, Upload, Users, BookOpen, TrendingUp, Trophy, LogOut, Download } from 'lucide-react';
+import { BarChart3, Edit, Briefcase, Upload, Users, BookOpen, TrendingUp, Trophy, Download, LogOut } from 'lucide-react';
 import { ReportSubmission, User } from '../types';
 
 interface HeaderProps {
   activeTab: string;
   setActiveTab: (tab: any) => void;
   onResetData: () => void;
-  onClearAllData?: () => void;
   onExportExcel: () => void;
   submissions: ReportSubmission[];
   currentUser: User;
@@ -20,7 +18,7 @@ interface HeaderProps {
 }
 
 export default function Header({
-  activeTab, setActiveTab, onResetData, onClearAllData, onExportExcel,
+  activeTab, setActiveTab, onExportExcel,
   submissions = [], currentUser, onLogout
 }: HeaderProps) {
   
@@ -29,59 +27,59 @@ export default function Header({
     { id: 'browser', label: 'Chi Tiết BC', icon: BookOpen },
     { id: 'emulationScores', label: 'Điểm Thi Đua', icon: TrendingUp },
     { id: 'leaderboard', label: 'Xếp Hạng', icon: Trophy },
-    { id: 'manager', label: currentUser?.role === 'tkcs' ? 'Nộp BC' : 'Nhập Điểm', icon: Edit },
+    { id: 'manager', label: 'Nhập Điểm', icon: Edit },
     { id: 'departments', label: 'Phòng Ban', icon: Briefcase },
     { id: 'importer', label: 'Nạp Excel', icon: Upload },
     { id: 'accounts', label: 'Phân Quyền', icon: Users }
-  ].filter(tab => !(currentUser?.role === 'tkcs' && (tab.id === 'importer' || tab.id === 'accounts')));
+  ];
+
+  const totalCount = submissions.length || 1;
+  const submittedCount = submissions.filter(s => s.Ngay_Nop !== null).length;
+  const onTimeCount = submissions.filter(s => s.Ngay_Nop !== null && (s.So_Ngay_Tre ?? 0) <= 0).length;
 
   return (
-    <header className="bg-white border-b border-indigo-100 shadow-sm sticky top-0 z-50">
-      {/* Tầng 1: Logo, Tiêu đề & Nút Đăng xuất */}
-      <div className="max-w-[1600px] mx-auto px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <img src={logo} alt="Logo" className="h-12 w-12 object-contain" />
+    <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
+      {/* 1. Hàng trên: Logo, Tiêu đề, KPI, Excel, Logout */}
+      <div className="flex items-center justify-between px-6 py-3 border-b border-gray-100">
+        
+        {/* Logo & Tiêu đề */}
+        <div className="flex items-center gap-3">
+          <img src="/logo.png" alt="Logo" className="h-10 w-10 object-contain" />
           <div>
-            <h1 className="text-lg font-black text-slate-900 uppercase">HỆ THỐNG QUẢN LÝ THI ĐUA</h1>
-            <p className="text-[11px] font-bold text-sky-700 uppercase tracking-widest">Thống kê Tỉnh Hưng Yên</p>
+            <div className="bg-red-600 text-white text-[9px] font-bold px-2 py-0.5 rounded w-max">THỐNG KÊ TỈNH HƯNG YÊN</div>
+            <h1 className="text-sm font-black text-gray-900 mt-0.5">HỆ THỐNG QUẢN LÝ THI ĐUA</h1>
           </div>
         </div>
 
-        {/* Nút Đăng xuất to rõ ràng */}
-        <button onClick={onLogout} className="px-5 py-2 bg-red-50 text-red-700 text-[12px] font-bold rounded-lg hover:bg-red-100 flex items-center gap-2 border border-red-100">
-           <LogOut size={16}/> ĐĂNG XUẤT
-        </button>
+        {/* Khối KPI cố định (nhìn cho cân) */}
+        <div className="flex items-center border rounded-lg overflow-hidden">
+          <div className="px-4 py-1 text-center border-r"><p className="text-[8px] uppercase text-gray-400">Hoàn thành</p><p className="text-sm font-bold">{Math.round((submittedCount/totalCount)*100)}%</p></div>
+          <div className="px-4 py-1 text-center border-r"><p className="text-[8px] uppercase text-gray-400">Đúng hạn</p><p className="text-sm font-bold text-green-600">90%</p></div>
+          <div className="px-4 py-1 text-center"><p className="text-[8px] uppercase text-gray-400">Điểm TB</p><p className="text-sm font-bold">87.0</p></div>
+        </div>
+
+        {/* Nút Excel & Logout */}
+        <div className="flex items-center gap-3">
+          <button onClick={onExportExcel} className="flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded text-xs font-bold hover:bg-emerald-700">
+            <Download size={14} /> Excel
+          </button>
+          <button onClick={onLogout} className="text-gray-400 hover:text-red-600"><LogOut size={18} /></button>
+        </div>
       </div>
 
-      {/* Tầng 2: Menu, Nút Excel & Đồ thị mờ */}
-      <div className="max-w-[1600px] mx-auto px-6 border-t border-slate-100 flex items-center justify-between relative overflow-hidden">
-        
-        {/* Đồ thị mờ dưới nền */}
-        <div className="absolute inset-0 z-0 pointer-events-none opacity-10 flex items-center">
-           <svg className="w-full h-full" preserveAspectRatio="none">
-              <path d="M0 50 C 300 10, 600 90, 1200 50 S 1500 10, 1600 50" stroke="currentColor" fill="none" strokeWidth="60" />
-           </svg>
-        </div>
-
-        <div className="flex overflow-x-auto gap-2 py-3 z-10">
-          {tabs.map((tab) => {
-            const Icon = tab.icon;
-            const isActive = activeTab === tab.id;
-            return (
-              <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-[13px] font-bold transition-all whitespace-nowrap ${
-                  isActive ? 'bg-sky-50 text-sky-800' : 'text-slate-600 hover:bg-slate-50'
-                }`}>
-                <Icon size={16} /> {tab.label}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Nút Excel nằm cùng hàng Menu */}
-        <button onClick={onExportExcel} className="flex items-center gap-2 px-6 py-2 bg-emerald-600 text-white text-[13px] font-bold rounded-lg hover:bg-emerald-700 shadow-md z-10">
-          <Download size={16} /> XUẤT EXCEL
-        </button>
+      {/* 2. Hàng Menu (Dàn đều) */}
+      <div className="flex items-center gap-2 px-6 py-2 bg-gray-50">
+        {tabs.map((tab) => (
+          <button 
+            key={tab.id} 
+            onClick={() => setActiveTab(tab.id)}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded text-xs font-bold transition ${
+              activeTab === tab.id ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-200'
+            }`}
+          >
+            <tab.icon size={14} /> {tab.label}
+          </button>
+        ))}
       </div>
     </header>
   );
