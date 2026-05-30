@@ -37,41 +37,41 @@ export default function Header({
   const totalCount = submissions.length || 1;
   const submittedCount = submissions.filter(s => s.Ngay_Nop !== null).length;
   const onTimeCount = submissions.filter(s => s.Ngay_Nop !== null && (s.So_Ngay_Tre ?? 0) <= 0).length;
-
-  // Biểu đồ trải dài: Dữ liệu nhiều cột hơn để chạy hết thanh
   const chartBars = Array.from({ length: 40 }, () => Math.floor(Math.random() * 60) + 20);
 
   return (
     <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-6 pt-4">
-        {/* Tầng 1: Logo, KPI, Nút */}
+        {/* Hàng 1: Logo, Tiêu đề Hệ thống, và Chỉ số */}
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4">
             <img src={logo} alt="Logo" className="h-12 w-12 object-contain" />
-            <div className="flex items-center gap-8 pl-6 border-l border-slate-200">
-               <div>
-                  <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Tiến độ</p>
-                  <p className="text-xl font-black text-slate-950">{Math.round((submittedCount / totalCount) * 100)}%</p>
-               </div>
-               <div>
-                  <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Đúng hạn</p>
-                  <p className="text-xl font-black text-blue-700">{Math.round((onTimeCount / (submittedCount || 1)) * 100)}%</p>
-               </div>
+            <div>
+               <h1 className="text-[15px] font-bold text-slate-950 uppercase tracking-tight">Hệ thống Phần mềm Quản lý Thi đua</h1>
+               <p className="text-[11px] font-medium text-slate-500 uppercase tracking-widest">Thống kê Tỉnh Hưng Yên</p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-             <button onClick={onExportExcel} className="px-6 py-2 bg-slate-950 text-white text-[12px] font-bold rounded-lg hover:bg-black transition-all">XUẤT EXCEL</button>
+
+          <div className="flex items-center gap-8 border-l border-slate-200 pl-8">
+             <div className="text-right">
+                <p className="text-[9px] font-bold text-slate-400 uppercase">Tiến độ</p>
+                <p className="text-[16px] font-black text-slate-950">{Math.round((submittedCount / totalCount) * 100)}%</p>
+             </div>
+             <div className="text-right">
+                <p className="text-[9px] font-bold text-slate-400 uppercase">Đúng hạn</p>
+                <p className="text-[16px] font-black text-sky-600">{Math.round((onTimeCount / (submittedCount || 1)) * 100)}%</p>
+             </div>
           </div>
         </div>
 
-        {/* Đồ thị chạy full chiều ngang thanh menu */}
-        <div className="flex items-end gap-[2px] h-4 w-full opacity-30 mb-2">
+        {/* Đồ thị chạy ngang */}
+        <div className="flex items-end gap-[2px] h-3 w-full opacity-30 mb-2">
             {chartBars.map((h, i) => (
                 <div key={i} className="flex-1 bg-sky-500 rounded-t-sm" style={{ height: `${h}%` }}></div>
             ))}
         </div>
 
-        {/* Tầng 2: Menu */}
+        {/* Hàng 2: Menu điều hướng */}
         <div className="flex overflow-x-auto gap-8 pt-1">
           {rawTabs.map((tab) => {
             const Icon = tab.icon;
