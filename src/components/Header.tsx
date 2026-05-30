@@ -4,7 +4,9 @@
  */
 
 import React, { useMemo } from 'react';
-import panelImage from '../panel.png'; // Lưu ý: đã đổi thành .png như bạn yêu cầu
+// LƯU Ý QUAN TRỌNG: Hãy đảm bảo tên file chính xác là panel.jpg hoặc panel.png
+// Dựa vào lỗi build trước đó, hãy kiểm tra file thực tế của bạn.
+import panelImage from '../panel.jpg'; 
 import { 
   BarChart3, Edit, Briefcase, Upload, Users, 
   BookOpen, TrendingUp, Trophy, LogOut, Download 
@@ -21,12 +23,7 @@ interface HeaderProps {
 }
 
 export default function Header({
-  activeTab, 
-  setActiveTab, 
-  onExportExcel, 
-  submissions, 
-  currentUser, 
-  onLogout
+  activeTab, setActiveTab, onExportExcel, submissions, currentUser, onLogout
 }: HeaderProps) {
   
   const tabs = useMemo(() => [
@@ -42,18 +39,19 @@ export default function Header({
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200 w-full overflow-hidden">
-      <div className="w-full max-w-[1300px] mx-auto px-4">
+      {/* Container chính: px-10 tạo khoảng cách lề 0.5cm mỗi bên */}
+      <div className="w-full max-w-[1300px] mx-auto px-10">
         
-        {/* Phần ảnh: Đã thêm px-5 để tạo khoảng cách 0.5cm mỗi bên */}
-        <div className="w-full pt-2 px-5">
+        {/* Phần ảnh: Chiều cao h-[240px] (đã tăng 1cm so với trước) */}
+        <div className="w-full pt-2">
           <img 
             src={panelImage} 
             alt="Header Panel" 
-            className="w-full h-[200px] object-cover rounded-lg block" 
+            className="w-full h-[240px] object-cover rounded-lg block" 
           />
         </div>
         
-        {/* Phần menu */}
+        {/* Phần menu: vẫn giữ px-2 để thẳng hàng với ảnh */}
         <div className="flex items-center justify-between mt-2 px-2">
           <div className="flex gap-1 overflow-x-auto no-scrollbar">
             {tabs.map((tab) => {
