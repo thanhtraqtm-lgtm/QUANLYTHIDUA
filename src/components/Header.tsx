@@ -4,7 +4,7 @@
  */
 
 import React, { useMemo } from 'react';
-import panelImage from '../panel.jpg'; 
+import panelImage from '../panel.png'; 
 import { 
   BarChart3, Edit, Briefcase, Upload, Users, 
   BookOpen, TrendingUp, Trophy, LogOut, Download 
