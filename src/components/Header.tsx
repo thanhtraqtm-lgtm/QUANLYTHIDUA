@@ -35,41 +35,38 @@ export default function Header({
   const submittedCount = submissions.filter(s => s.Ngay_Nop !== null).length;
   
   return (
-    <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-6 py-3">
+    <header className="bg-white border-b-2 border-slate-100 shadow-sm sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-8 py-5">
         <div className="flex items-center justify-between">
-          {/* Logo & Đồ thị mini */}
-          <div className="flex items-center gap-4">
-            {/* Sử dụng logo.png */}
-            <img src="/logo.png" alt="Logo" className="h-10 w-10 object-contain" />
+          {/* Logo phóng to, nổi bật */}
+          <div className="flex items-center gap-6">
+            <img src="/logo.png" alt="Logo" className="h-16 w-16 object-contain" />
             
-            <div className="hidden md:flex items-center gap-2 border-l border-slate-200 pl-6">
-               <div className="flex flex-col items-start">
-                  <span className="text-[9px] font-bold text-slate-400 uppercase">Tiến độ</span>
-                  <div className="flex items-end gap-1 h-4">
-                    {[20, 40, 60, 30, 80].map((h, i) => (
-                        <div key={i} className="w-1 bg-sky-500 rounded-sm" style={{ height: `${h}%` }}></div>
-                    ))}
-                  </div>
+            {/* KPI hiển thị đậm nét, dễ đọc */}
+            <div className="flex items-center gap-8 pl-8 border-l border-slate-200">
+               <div>
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tiến độ hoàn thành</p>
+                  <p className="text-[24px] font-black text-slate-950 mt-0.5">{Math.round((submittedCount / totalCount) * 100)}%</p>
                </div>
-               <span className="text-[12px] font-black text-slate-900 ml-2">{Math.round((submittedCount / totalCount) * 100)}%</span>
             </div>
           </div>
 
-          <button onClick={onExportExcel} className="px-4 py-1.5 text-[12px] bg-sky-600 text-white font-semibold rounded hover:bg-sky-700 transition-all">Xuất Excel</button>
+          <button onClick={onExportExcel} className="px-8 py-3 text-[14px] bg-slate-950 text-white font-bold rounded-xl hover:bg-black transition-all shadow-lg">
+            Xuất Excel
+          </button>
         </div>
 
-        {/* Menu thanh mảnh */}
-        <div className="flex overflow-x-auto gap-8 mt-4 pt-2 border-t border-slate-100">
+        {/* Menu thanh thoát nhưng đậm đà */}
+        <div className="flex overflow-x-auto gap-10 mt-6 pt-4 border-t border-slate-100">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
             return (
               <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 pb-2 text-[12px] font-semibold transition-all border-b-2 whitespace-nowrap ${
-                  isActive ? 'border-sky-600 text-sky-700' : 'border-transparent text-slate-500 hover:text-slate-900'
+                className={`flex items-center gap-3 pb-4 text-[14px] font-bold transition-all border-b-[3px] whitespace-nowrap ${
+                  isActive ? 'border-sky-600 text-sky-700' : 'border-transparent text-slate-500 hover:text-slate-950'
                 }`}>
-                <Icon className="w-3.5 h-3.5" />
+                <Icon className="w-5 h-5" />
                 {tab.label}
               </button>
             );
