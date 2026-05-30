@@ -27,8 +27,10 @@ export default function StatsDashboard({ submissions, leaderboard, onSelectUnit 
   const lateCount = submittedReports.filter(s => (s.So_Ngay_Tre ?? 0) > 0).length;
   const onTimeRate = totalSubmittedCount > 0 ? (onTimeCount / totalSubmittedCount) * 100 : 0;
 
-  // Overdue and Non-submitted
-  const overdueCount = submissions.filter(s => s.Ngay_Nop === null && new Date(s.Han_Nop) < new Date('2026-05-25')).length;
+  // Sử dụng ngày hiện tại của hệ thống thay vì ngày cố định
+const overdueCount = submissions.filter(s => 
+  s.Ngay_Nop === null && new Date(s.Han_Nop) < new Date() 
+).length;
 
   // Average Score calculations
   const scoredSubmissions = submissions.filter(s => s.Tong_Diem !== null);
