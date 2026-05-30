@@ -1,8 +1,3 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import React, { useMemo } from 'react';
 import panelImage from '../panel.jpg'; 
 import { 
@@ -24,7 +19,6 @@ export default function Header({
   activeTab, setActiveTab, onExportExcel, currentUser, onLogout
 }: HeaderProps) {
   
-  // Logic tabs dùng useMemo để tối ưu hiệu năng
   const tabs = useMemo(() => [
     { id: 'dashboard', label: 'Tổng Quan', icon: BarChart3 },
     { id: 'browser', label: 'Chi Tiết BC', icon: BookOpen },
@@ -38,52 +32,54 @@ export default function Header({
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200">
-      {/* 1. Phần ảnh: Thêm px-4 để đồng bộ với menu */}
-      <div className="w-full px-4 pt-2">
-        <img 
-          src={panelImage} 
-          alt="Header Panel" 
-          className="w-full h-[150px] object-cover rounded-lg block" 
-        />
-      </div>
-      
-      {/* 2. Phần menu: px-4 đảm bảo căn lề thẳng hàng với ảnh bên trên */}
-      <div className="flex items-center justify-between px-4 bg-white mt-2">
-        <div className="flex gap-1 overflow-x-auto no-scrollbar">
-          {tabs.map((tab) => {
-            const Icon = tab.icon;
-            const isActive = activeTab === tab.id;
-            return (
-              <button 
-                key={tab.id} 
-                onClick={() => setActiveTab(tab.id)}
-                aria-current={isActive ? 'page' : undefined}
-                className={`flex items-center gap-1.5 px-3 py-3 text-[12px] font-bold whitespace-nowrap border-b-2 transition-all -mb-[1px] ${
-                  isActive 
-                    ? 'border-blue-600 text-blue-700' 
-                    : 'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300'
-                }`}
-              >
-                <Icon size={14} /> {tab.label}
-              </button>
-            );
-          })}
+      {/* CONTAINER CHÍNH: Giới hạn chiều rộng và căn giữa cho toàn bộ phần Header */}
+      <div className="w-full max-w-[1300px] mx-auto px-4">
+        
+        {/* Phần ảnh: Đã nằm trong container chính nên sẽ bằng chiều rộng với menu */}
+        <div className="w-full pt-2">
+          <img 
+            src={panelImage} 
+            alt="Header Panel" 
+            className="w-full h-[150px] object-cover rounded-lg block" 
+          />
         </div>
+        
+        {/* Phần menu: Đã nằm trong cùng container nên chắc chắn thẳng hàng */}
+        <div className="flex items-center justify-between mt-2">
+          <div className="flex gap-1 overflow-x-auto no-scrollbar">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <button 
+                  key={tab.id} 
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center gap-1.5 px-3 py-3 text-[12px] font-bold whitespace-nowrap border-b-2 transition-all -mb-[1px] ${
+                    isActive 
+                      ? 'border-blue-600 text-blue-700' 
+                      : 'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300'
+                  }`}
+                >
+                  <Icon size={14} /> {tab.label}
+                </button>
+              );
+            })}
+          </div>
 
-        {/* Nút chức năng */}
-        <div className="flex items-center gap-2 py-1 shrink-0 ml-4">
-          <button 
-            onClick={onExportExcel} 
-            className="flex items-center gap-1 px-3 py-1 bg-emerald-600 text-white text-[12px] font-bold rounded hover:bg-emerald-700 transition-colors"
-          >
-            <Download size={14} /> Excel
-          </button>
-          <button 
-            onClick={onLogout} 
-            className="flex items-center gap-1 px-3 py-1 bg-red-50 text-red-700 text-[12px] font-bold rounded border border-red-100 hover:bg-red-100 transition-colors"
-          >
-            <LogOut size={14} /> Đăng xuất
-          </button>
+          <div className="flex items-center gap-2 py-1 shrink-0 ml-4">
+            <button 
+              onClick={onExportExcel} 
+              className="flex items-center gap-1 px-3 py-1 bg-emerald-600 text-white text-[12px] font-bold rounded hover:bg-emerald-700 transition-colors"
+            >
+              <Download size={14} /> Excel
+            </button>
+            <button 
+              onClick={onLogout} 
+              className="flex items-center gap-1 px-3 py-1 bg-red-50 text-red-700 text-[12px] font-bold rounded border border-red-100 hover:bg-red-100 transition-colors"
+            >
+              <LogOut size={14} /> Đăng xuất
+            </button>
+          </div>
         </div>
       </div>
     </header>
