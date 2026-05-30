@@ -150,16 +150,7 @@ export default function Login({ onLoginSuccess, units }: LoginProps) {
             
             {activeRole === 'admin' ? (
               // ADMIN & ROOM FORM
-              <div className="space-y-4">
-                <div className="space-y-1.5 bg-sky-50/50 p-2.5 rounded-lg border border-sky-100 mb-2">
-                  <div className="flex items-start space-x-1.5 text-sky-800 text-[10.5px]">
-                    <Info className="w-3.5 h-3.5 shrink-0 text-sky-500 mt-0.5" />
-                    <p className="leading-relaxed">
-                      Dành cho <strong className="font-bold">Quản trị viên (admin)</strong> và cán bộ của <strong className="font-bold">5 phòng chuyên môn</strong> gồm tổng hợp, công nghiệp, nông nghiệp & xã hội, thương mại, tổ chức hành chính (gợi ý: <code>phong_th</code>, <code>phong_cn</code>, <code>phong_nnxh</code>,... mật khẩu <code>123</code>).
-                    </p>
-                  </div>
-                </div>
-
+              
                 <div className="space-y-1.5">
                   <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block font-mono">Tài khoản Quản lý / Phòng</label>
                   <div className="relative">
