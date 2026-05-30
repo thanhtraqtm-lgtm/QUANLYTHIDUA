@@ -1,0 +1,6 @@
+{
+  "name": "Phần mềm Giao điểm Thi đua",
+  "description": "Hệ thống quản lý thời gian nộp, đánh giá chất lượng báo cáo và xếp hạng điểm thi đua của các đơn vị thống kê cấp huyện.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
