@@ -4,7 +4,6 @@
  */
 
 import React, { useMemo } from 'react';
-// LƯU Ý 1: Nếu tên file là panel.png, hãy sửa thành '../panel.png'
 import panelImage from '../panel.png'; 
 import { 
   BarChart3, Edit, Briefcase, Upload, Users, 
@@ -40,13 +39,27 @@ export default function Header({
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200 w-full overflow-hidden">
       <div className="w-full max-w-[1300px] mx-auto px-10">
         
-        {/* Phần ảnh: Chiều cao đã chỉnh thành 270px */}
-        <div className="w-full pt-2">
+        {/* Phần ảnh: Đã thêm 'relative' để đồ thị nằm đè lên được */}
+        <div className="w-full pt-2 relative">
           <img 
             src={panelImage} 
             alt="Header Panel" 
             className="w-full h-[270px] object-cover rounded-lg block" 
           />
+
+          {/* ĐỒ THỊ LƯỢN SÓNG: Nằm ở góc phải trên cùng */}
+          <div className="absolute top-6 right-6 bg-white/80 backdrop-blur-sm p-3 rounded-lg border border-white/50 shadow-sm hidden sm:block">
+            <span className="text-[9px] font-bold text-blue-800 uppercase tracking-wider">Xu hướng</span>
+            <svg width="100" height="25" viewBox="0 0 100 25" className="mt-1">
+              <path 
+                d="M 0 20 C 20 5, 40 25, 60 10 S 80 20, 100 5" 
+                fill="none" 
+                stroke="#2563eb" 
+                strokeWidth="2.5" 
+                strokeLinecap="round"
+              />
+            </svg>
+          </div>
         </div>
         
         <div className="flex items-center justify-between mt-2 px-2">
