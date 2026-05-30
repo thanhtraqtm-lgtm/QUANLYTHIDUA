@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import panelImage from '../panel.png'; // Đảm bảo file panel.png nằm trong thư mục src
+import panelImage from '../panel.jpg'; // Đường dẫn tới ảnh của bạn
 import { 
   BarChart3, Edit, Briefcase, Upload, Users, 
   BookOpen, TrendingUp, Trophy, LogOut, Download 
@@ -14,8 +14,6 @@ import { ReportSubmission, User } from '../types';
 interface HeaderProps {
   activeTab: string;
   setActiveTab: (tab: any) => void;
-  onResetData: () => void;
-  onClearAllData?: () => void;
   onExportExcel: () => void;
   submissions: ReportSubmission[];
   currentUser: User;
@@ -26,7 +24,7 @@ export default function Header({
   activeTab, setActiveTab, onExportExcel, currentUser, onLogout
 }: HeaderProps) {
   
-  const rawTabs = [
+  const tabs = [
     { id: 'dashboard', label: 'Tổng Quan', icon: BarChart3 },
     { id: 'browser', label: 'Chi Tiết BC', icon: BookOpen },
     { id: 'emulationScores', label: 'Điểm Thi Đua', icon: TrendingUp },
@@ -35,26 +33,21 @@ export default function Header({
     { id: 'departments', label: 'Phòng Ban', icon: Briefcase },
     { id: 'importer', label: 'Nạp Excel', icon: Upload },
     { id: 'accounts', label: 'Phân Quyền', icon: Users }
-  ];
-
-  const tabs = rawTabs.filter(tab => 
-    !(currentUser?.role === 'tkcs' && (tab.id === 'importer' || tab.id === 'accounts'))
-  );
+  ].filter(tab => !(currentUser?.role === 'tkcs' && (tab.id === 'importer' || tab.id === 'accounts')));
 
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-gray-200">
-      {/* 1. Phần ảnh Panel tĩnh - Không bao giờ bị vỡ bố cục */}
-      <div className="w-full">
+    <header className="sticky top-0 z-50 bg-white shadow-sm">
+      {/* Container của ảnh: đảm bảo khớp chiều rộng và chiều cao cố định */}
+      <div className="w-full overflow-hidden" style={{ height: '150px' }}>
         <img 
           src={panelImage} 
           alt="Header Panel" 
-          className="w-full h-auto block object-cover max-h-[160px]" 
+          className="w-full h-full object-cover" 
         />
       </div>
       
-      {/* 2. Thanh Menu và Nút chức năng phía dưới */}
-      <div className="flex items-center justify-between px-6 py-2 bg-white">
-        {/* Khu vực Menu */}
+      {/* Thanh Menu và Nút chức năng phía dưới */}
+      <div className="flex items-center justify-between px-6 py-2 border-b border-gray-200 bg-white">
         <div className="flex gap-2 overflow-x-auto scrollbar-hide">
           {tabs.map((tab) => {
             const Icon = tab.icon;
@@ -79,13 +72,13 @@ export default function Header({
         <div className="flex items-center gap-3 ml-4 shrink-0">
           <button 
             onClick={onExportExcel} 
-            className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white text-[13px] font-bold rounded-lg hover:bg-emerald-700 shadow-sm"
+            className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white text-[13px] font-bold rounded hover:bg-emerald-700"
           >
             <Download size={16} /> Xuất Excel
           </button>
           <button 
             onClick={onLogout} 
-            className="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-700 text-[13px] font-bold rounded-lg hover:bg-red-100 border border-red-100"
+            className="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-700 text-[13px] font-bold rounded border border-red-100 hover:bg-red-100"
           >
             <LogOut size={16} /> Đăng xuất
           </button>
