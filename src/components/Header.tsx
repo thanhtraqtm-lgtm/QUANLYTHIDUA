@@ -5,7 +5,7 @@
 
 import React, { useMemo } from 'react';
 // LƯU Ý 1: Nếu tên file là panel.png, hãy sửa thành '../panel.png'
-import panelImage from '../panel.jpg'; 
+import panelImage from '../panel.png'; 
 import { 
   BarChart3, Edit, Briefcase, Upload, Users, 
   BookOpen, TrendingUp, Trophy, LogOut, Download 
