@@ -4,6 +4,7 @@
  */
 
 import React, { useMemo } from 'react';
+// LƯU Ý: Đảm bảo file panel.png nằm trong thư mục ../ (cùng cấp với thư mục chứa file này)
 import panelImage from '../panel.png'; 
 import { 
   BarChart3, Edit, Briefcase, Upload, Users, 
@@ -36,33 +37,35 @@ export default function Header({
   ].filter(tab => !(currentUser?.role === 'tkcs' && (tab.id === 'importer' || tab.id === 'accounts'))), [currentUser?.role]);
 
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-gray-200 w-full overflow-hidden">
+    // Đã xóa overflow-hidden ở đây để đồ thị không bị cắt
+    <header className="sticky top-0 z-50 bg-white border-b border-gray-200 w-full shadow-sm">
       <div className="w-full max-w-[1300px] mx-auto px-10">
         
-        {/* Phần ảnh: Thêm relative và z-10 */}
-<div className="w-full pt-2 relative z-10">
-  <img 
-    src={panelImage} 
-    alt="Header Panel" 
-    className="w-full h-[270px] object-cover rounded-lg block" 
-  />
+        {/* Container Ảnh */}
+        <div className="w-full pt-2 relative">
+          <img 
+            src={panelImage} 
+            alt="Header Panel" 
+            className="w-full h-[270px] object-cover rounded-lg block" 
+          />
 
-  {/* ĐỒ THỊ LƯỢN SÓNG: Đã bỏ hidden sm:block để hiện luôn, thêm z-20 */}
-  <div className="absolute top-6 right-6 bg-white/90 p-3 rounded-lg border border-gray-200 shadow-md z-20">
-    <p className="text-[9px] font-bold text-blue-800 uppercase tracking-wider mb-1">Xu hướng</p>
-    <svg width="100" height="25" viewBox="0 0 100 25">
-      <path 
-        d="M 0 20 C 20 5, 40 25, 60 10 S 80 20, 100 5" 
-        fill="none" 
-        stroke="#2563eb" 
-        strokeWidth="3" 
-        strokeLinecap="round"
-      />
-    </svg>
-  </div>
-</div>
+          {/* ĐỒ THỊ LƯỢN SÓNG: Nằm góc phải phía trên ảnh */}
+          <div className="absolute top-6 right-6 z-50 bg-white/90 backdrop-blur p-3 rounded-lg border border-gray-200 shadow-2xl">
+             <div className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Xu hướng</div>
+             <svg width="100" height="30" viewBox="0 0 100 30" preserveAspectRatio="none">
+               <path 
+                 d="M 0 25 C 20 5, 40 25, 60 10 S 80 25, 100 5" 
+                 fill="none" 
+                 stroke="#2563eb" 
+                 strokeWidth="3" 
+                 strokeLinecap="round"
+               />
+             </svg>
+          </div>
+        </div>
         
-        <div className="flex items-center justify-between mt-2 px-2">
+        {/* Menu điều hướng */}
+        <div className="flex items-center justify-between mt-2 px-2 pb-1">
           <div className="flex gap-1 overflow-x-auto no-scrollbar">
             {tabs.map((tab) => {
               const Icon = tab.icon;
