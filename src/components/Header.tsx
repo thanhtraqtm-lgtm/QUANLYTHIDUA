@@ -4,7 +4,6 @@
  */
 
 import React, { useMemo } from 'react';
-// LƯU Ý: Đảm bảo file panel.png nằm trong thư mục ../ (cùng cấp với thư mục chứa file này)
 import panelImage from '../panel.png'; 
 import { 
   BarChart3, Edit, Briefcase, Upload, Users, 
@@ -37,7 +36,6 @@ export default function Header({
   ].filter(tab => !(currentUser?.role === 'tkcs' && (tab.id === 'importer' || tab.id === 'accounts'))), [currentUser?.role]);
 
   return (
-    // Đã xóa overflow-hidden ở đây để đồ thị không bị cắt
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200 w-full shadow-sm">
       <div className="w-full max-w-[1300px] mx-auto px-10">
         
@@ -49,15 +47,15 @@ export default function Header({
             className="w-full h-[270px] object-cover rounded-lg block" 
           />
 
-          {/* ĐỒ THỊ LƯỢN SÓNG: Nằm góc phải phía trên ảnh */}
-          <div className="absolute top-6 right-6 z-50 bg-white/90 backdrop-blur p-3 rounded-lg border border-gray-200 shadow-2xl">
-             <div className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Xu hướng</div>
-             <svg width="100" height="30" viewBox="0 0 100 30" preserveAspectRatio="none">
+          {/* ĐỒ THỊ - ĐÃ ÉP HIỂN THỊ MÀU ĐỎ RỰC - Z-INDEX 9999 */}
+          <div className="absolute top-4 right-4 z-[9999] bg-white p-4 rounded-xl border-4 border-red-600 shadow-2xl">
+             <p className="text-[10px] font-bold text-red-600 uppercase mb-1">Xu hướng (Check)</p>
+             <svg width="120" height="40" viewBox="0 0 100 30">
                <path 
                  d="M 0 25 C 20 5, 40 25, 60 10 S 80 25, 100 5" 
                  fill="none" 
-                 stroke="#2563eb" 
-                 strokeWidth="3" 
+                 stroke="#ff0000" 
+                 strokeWidth="4" 
                  strokeLinecap="round"
                />
              </svg>
@@ -87,16 +85,10 @@ export default function Header({
           </div>
 
           <div className="flex items-center gap-2 py-1 shrink-0 ml-4">
-            <button 
-              onClick={onExportExcel} 
-              className="flex items-center gap-1 px-3 py-1 bg-emerald-600 text-white text-[12px] font-bold rounded hover:bg-emerald-700 transition-colors"
-            >
+            <button onClick={onExportExcel} className="flex items-center gap-1 px-3 py-1 bg-emerald-600 text-white text-[12px] font-bold rounded hover:bg-emerald-700 transition-colors">
               <Download size={14} /> Excel
             </button>
-            <button 
-              onClick={onLogout} 
-              className="flex items-center gap-1 px-3 py-1 bg-red-50 text-red-700 text-[12px] font-bold rounded border border-red-100 hover:bg-red-100 transition-colors"
-            >
+            <button onClick={onLogout} className="flex items-center gap-1 px-3 py-1 bg-red-50 text-red-700 text-[12px] font-bold rounded border border-red-100 hover:bg-red-100 transition-colors">
               <LogOut size={14} /> Đăng xuất
             </button>
           </div>
