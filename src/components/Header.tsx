@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import panelImage from '../panel.jpg'; // Đường dẫn tới ảnh của bạn
+import panelImage from '../panel.jpg'; 
 import { 
   BarChart3, Edit, Briefcase, Upload, Users, 
   BookOpen, TrendingUp, Trophy, LogOut, Download 
@@ -36,19 +36,19 @@ export default function Header({
   ].filter(tab => !(currentUser?.role === 'tkcs' && (tab.id === 'importer' || tab.id === 'accounts')));
 
   return (
-    <header className="sticky top-0 z-50 bg-white shadow-sm">
-      {/* Container của ảnh: đảm bảo khớp chiều rộng và chiều cao cố định */}
-      <div className="w-full overflow-hidden" style={{ height: '150px' }}>
+    <header className="sticky top-0 z-50 bg-white">
+      {/* ẢNH PANEL: Đảm bảo không có padding, không có margin, ép sát mép */}
+      <div className="w-full">
         <img 
           src={panelImage} 
           alt="Header Panel" 
-          className="w-full h-full object-cover" 
+          className="w-full h-[150px] object-cover block" 
         />
       </div>
       
-      {/* Thanh Menu và Nút chức năng phía dưới */}
-      <div className="flex items-center justify-between px-6 py-2 border-b border-gray-200 bg-white">
-        <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+      {/* THANH MENU: Đảm bảo chiều rộng bằng ảnh bên trên */}
+      <div className="flex items-center justify-between px-4 border-b border-gray-200 bg-white">
+        <div className="flex gap-1 overflow-x-auto">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -56,31 +56,25 @@ export default function Header({
               <button 
                 key={tab.id} 
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2 text-[13px] font-bold whitespace-nowrap transition-all border-b-2 ${
+                className={`flex items-center gap-1.5 px-3 py-2 text-[12px] font-bold whitespace-nowrap border-b-2 transition-all ${
                   isActive 
-                    ? 'border-blue-600 text-blue-700 bg-blue-50' 
-                    : 'border-transparent text-gray-600 hover:bg-gray-50'
+                    ? 'border-blue-600 text-blue-700' 
+                    : 'border-transparent text-gray-600 hover:text-gray-900'
                 }`}
               >
-                <Icon size={16} /> {tab.label}
+                <Icon size={14} /> {tab.label}
               </button>
             );
           })}
         </div>
 
-        {/* Nút Xuất Excel & Đăng xuất */}
-        <div className="flex items-center gap-3 ml-4 shrink-0">
-          <button 
-            onClick={onExportExcel} 
-            className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white text-[13px] font-bold rounded hover:bg-emerald-700"
-          >
-            <Download size={16} /> Xuất Excel
+        {/* Nút chức năng */}
+        <div className="flex items-center gap-2 py-1 shrink-0">
+          <button onClick={onExportExcel} className="flex items-center gap-1 px-3 py-1 bg-emerald-600 text-white text-[12px] font-bold rounded hover:bg-emerald-700">
+            <Download size={14} /> Excel
           </button>
-          <button 
-            onClick={onLogout} 
-            className="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-700 text-[13px] font-bold rounded border border-red-100 hover:bg-red-100"
-          >
-            <LogOut size={16} /> Đăng xuất
+          <button onClick={onLogout} className="flex items-center gap-1 px-3 py-1 bg-red-50 text-red-700 text-[12px] font-bold rounded border border-red-100">
+            <LogOut size={14} /> Đăng xuất
           </button>
         </div>
       </div>
