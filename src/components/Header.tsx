@@ -1,3 +1,8 @@
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import React, { useMemo } from 'react';
 import panelImage from '../panel.jpg'; 
 import { 
@@ -10,13 +15,18 @@ interface HeaderProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
   onExportExcel: () => void;
-  submissions: ReportSubmission[];
+  submissions: ReportSubmission[]; // Props này đang bị thiếu trong hàm
   currentUser: User;
   onLogout: () => void;
 }
 
 export default function Header({
-  activeTab, setActiveTab, onExportExcel, currentUser, onLogout
+  activeTab, 
+  setActiveTab, 
+  onExportExcel, 
+  submissions, // <--- ĐÃ THÊM: Sửa lỗi bôi đỏ ở đây
+  currentUser, 
+  onLogout
 }: HeaderProps) {
   
   const tabs = useMemo(() => [
@@ -31,11 +41,11 @@ export default function Header({
   ].filter(tab => !(currentUser?.role === 'tkcs' && (tab.id === 'importer' || tab.id === 'accounts'))), [currentUser?.role]);
 
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-gray-200">
-      {/* CONTAINER CHÍNH: Giới hạn chiều rộng và căn giữa cho toàn bộ phần Header */}
+    // Thêm overflow-hidden vào header để tránh tràn ngang
+    <header className="sticky top-0 z-50 bg-white border-b border-gray-200 w-full overflow-hidden">
       <div className="w-full max-w-[1300px] mx-auto px-4">
         
-        {/* Phần ảnh: Đã nằm trong container chính nên sẽ bằng chiều rộng với menu */}
+        {/* Phần ảnh: Đảm bảo kích thước ổn định */}
         <div className="w-full pt-2">
           <img 
             src={panelImage} 
@@ -44,7 +54,7 @@ export default function Header({
           />
         </div>
         
-        {/* Phần menu: Đã nằm trong cùng container nên chắc chắn thẳng hàng */}
+        {/* Phần menu */}
         <div className="flex items-center justify-between mt-2">
           <div className="flex gap-1 overflow-x-auto no-scrollbar">
             {tabs.map((tab) => {
