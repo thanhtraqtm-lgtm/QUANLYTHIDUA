@@ -424,7 +424,7 @@ export default function EmulationScores({ submissions, units, departments }: Emu
           </div>
           <div>
             <span className="text-xs text-slate-600 font-bold uppercase leading-none block">Điểm thi đua TB</span>
-            <span className="text-xl sm:text-2xl font-black font-sans text-slate-900 block mt-1.5">{summaryKPI.emulationScore} đ</span>
+            <span className="text-xl sm:text-2xl font-black font-sans text-slate-900 block mt-1.5">{summaryKPI.emulationScore}</span>
             <span className="text-xs text-indigo-700 font-bold">Toàn bộ phạm vi lọc</span>
           </div>
         </div>
@@ -477,7 +477,7 @@ export default function EmulationScores({ submissions, units, departments }: Emu
             </h4>
           </div>
           <div className="text-[10px] text-slate-400 font-mono text-right italic">
-            Hiển thị điểm thi đua (0 - 100đ) của các Chi cục có dữ liệu chỉ tiêu
+            Hiển thị điểm thi đua (0 - 100) của các Chi cục có dữ liệu chỉ tiêu
           </div>
         </div>
 
@@ -496,10 +496,10 @@ export default function EmulationScores({ submissions, units, departments }: Emu
               <line x1="45" y1="100" x2="585" y2="100" stroke="#cbd5e1" strokeWidth="1.2" />
 
               {/* Y Axis markings */}
-              <text x="20" y="14" fontSize="8" fill="#94a3b8" fontFamily="monospace" textAnchor="middle">100đ</text>
-              <text x="20" y="44" fontSize="8" fill="#94a3b8" fontFamily="monospace" textAnchor="middle">50đ</text>
-              <text x="20" y="74" fontSize="8" fill="#94a3b8" fontFamily="monospace" textAnchor="middle">25đ</text>
-              <text x="20" y="104" fontSize="8" fill="#94a3b8" fontFamily="monospace" textAnchor="middle">0đ</text>
+              <text x="20" y="14" fontSize="8" fill="#94a3b8" fontFamily="monospace" textAnchor="middle">100</text>
+              <text x="20" y="44" fontSize="8" fill="#94a3b8" fontFamily="monospace" textAnchor="middle">50</text>
+              <text x="20" y="74" fontSize="8" fill="#94a3b8" fontFamily="monospace" textAnchor="middle">25</text>
+              <text x="20" y="104" fontSize="8" fill="#94a3b8" fontFamily="monospace" textAnchor="middle">0</text>
 
               {/* Dynamic Bars render for active units */}
               {processedScores.filter(item => item.Has_Data).map((item, idx, arr) => {
@@ -720,7 +720,7 @@ export default function EmulationScores({ submissions, units, departments }: Emu
                           ) : (
                             <div className="flex flex-col items-center">
                               <span className="font-sans text-xs sm:text-sm font-black text-slate-900 bg-indigo-50 border border-indigo-150 px-3 py-1.5 rounded-lg shadow-2xs">
-                                {row.Diem_Thi_Dua}đ
+                                {row.Diem_Thi_Dua}
                               </span>
                               {/* progress micro line */}
                               <div className="w-16 h-1.5 bg-slate-200 rounded-full mt-2 overflow-hidden">
@@ -808,11 +808,11 @@ export default function EmulationScores({ submissions, units, departments }: Emu
                                                 {dateDisplay}
                                               </span>
                                             </td>
-                                            <td className="py-3 px-2 text-center font-mono font-bold text-slate-800">{sub.Diem_Dinh_Muc}đ</td>
-                                            <td className="py-3 px-2 text-center font-mono font-bold text-sky-700">{sub.Diem_Thoi_Gian ?? 0}đ</td>
-                                            <td className="py-3 px-2 text-center font-mono font-bold text-amber-700">{sub.Diem_Chat_Luong ?? 0}đ</td>
+                                            <td className="py-3 px-2 text-center font-mono font-bold text-slate-800">{sub.Diem_Dinh_Muc}</td>
+                                            <td className="py-3 px-2 text-center font-mono font-bold text-sky-700">{sub.Diem_Thoi_Gian ?? 0}</td>
+                                            <td className="py-3 px-2 text-center font-mono font-bold text-amber-700">{sub.Diem_Chat_Luong ?? 0}</td>
                                             <td className="py-3 px-3 text-center font-mono font-black text-slate-950 bg-indigo-50 text-sm border-x border-indigo-100/50">
-                                              {sub.Tong_Diem ?? 0}đ
+                                              {sub.Tong_Diem ?? 0}
                                             </td>
                                             <td className="py-3 px-3 text-slate-900 italic max-w-xs font-medium leading-normal" title={sub.Nhan_Xet}>
                                               {sub.Nhan_Xet || <span className="text-slate-400 font-light">Không có ghi chú</span>}

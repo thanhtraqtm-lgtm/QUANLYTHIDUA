@@ -137,6 +137,8 @@ export function generateInitialSubmissions(): ReportSubmission[] {
         if (isPast) {
           // 92% chance of being submitted if deadline has passed
           const submitted = Math.random() < 0.92;
+          const maxThoiGian = template.score / 2;
+          const maxChatLuong = template.score / 2;
           if (submitted) {
             // 85% chance of being on time, 15% chance of late
             const isLate = Math.random() < 0.15;
@@ -149,11 +151,11 @@ export function generateInitialSubmissions(): ReportSubmission[] {
               ngayNop = subDate.toISOString().split('T')[0];
               soNgayTre = delayDays;
               
-              // Penalty: -2 index points per day late, minimum score is 0
-              diemThoiGian = Math.max(0, template.score - (delayDays * 2));
+              // Penalty: -1 point per day late, minimum score is 0
+              diemThoiGian = Math.max(0, maxThoiGian - delayDays);
               // Quality score random between 80% to 100% of standard
               const qualityRatio = 0.8 + (Math.random() * 0.2);
-              diemChatLuong = Math.round(template.score * qualityRatio * 10) / 10;
+              diemChatLuong = Math.round(maxChatLuong * qualityRatio * 10) / 10;
               tongDiem = Math.round((diemThoiGian + diemChatLuong) * 10) / 10;
               nhanXet = `Nộp trễ hạn ${delayDays} ngày. Báo cáo chất lượng đạt chuẩn, cần chú ý đảm bảo đúng kỳ sau.`;
             } else {
@@ -164,11 +166,11 @@ export function generateInitialSubmissions(): ReportSubmission[] {
               
               ngayNop = subDate.toISOString().split('T')[0];
               soNgayTre = 0;
-              diemThoiGian = template.score; // Maximum score for time constraint
+              diemThoiGian = maxThoiGian; // Maximum score for time constraint
               
               // Quality score random high (85% to 100%)
               const qualityRatio = 0.85 + (Math.random() * 0.15);
-              diemChatLuong = Math.round(template.score * qualityRatio * 10) / 10;
+              diemChatLuong = Math.round(maxChatLuong * qualityRatio * 10) / 10;
               tongDiem = Math.round((diemThoiGian + diemChatLuong) * 10) / 10;
               nhanXet = "Nộp đúng hạn đạt kết quả xuất sắc. Đối chiếu biểu số liệu nghiệp vụ sạch sẽ.";
             }
@@ -185,14 +187,16 @@ export function generateInitialSubmissions(): ReportSubmission[] {
           // Deadline is in the FUTURE (e.g., June or Dec 2026)
           // 25% chance they submitted early, 75% still pending
           const submittedEarly = Math.random() < 0.25;
+          const maxThoiGian = template.score / 2;
+          const maxChatLuong = template.score / 2;
           if (submittedEarly) {
             const subDate = new Date(deadlineDate);
             subDate.setDate(subDate.getDate() - Math.floor(Math.random() * 10) - 1);
             
             ngayNop = subDate.toISOString().split('T')[0];
             soNgayTre = 0;
-            diemThoiGian = template.score;
-            diemChatLuong = Math.round(template.score * 0.95 * 10) / 10;
+            diemThoiGian = maxThoiGian;
+            diemChatLuong = Math.round(maxChatLuong * 0.95 * 10) / 10;
             tongDiem = Math.round((diemThoiGian + diemChatLuong) * 10) / 10;
             nhanXet = "Nộp báo cáo sớm trước thời hạn định. Số liệu đã được phê chuẩn.";
           } else {

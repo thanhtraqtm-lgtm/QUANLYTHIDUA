@@ -18,7 +18,11 @@ import {
   Filter,
   UserCheck,
   Sparkles,
-  Info
+  Info,
+  RotateCcw,
+  Database,
+  AlertTriangle,
+  Download
 } from 'lucide-react';
 import { User, Unit, Department } from '../types';
 import { DEPARTMENTS_DATA } from '../data/emulationData';
@@ -31,6 +35,9 @@ interface AccountManagerProps {
   onResetAccounts: () => void;
   units: Unit[];
   currentUser: User;
+  onResetData?: () => void;
+  onClearAllData?: () => void;
+  onExportExcel?: () => void;
 }
 
 const AVAILABLE_PERMISSIONS = [
@@ -47,7 +54,10 @@ export default function AccountManager({
   onDeleteAccount,
   onResetAccounts,
   units,
-  currentUser
+  currentUser,
+  onResetData,
+  onClearAllData,
+  onExportExcel
 }: AccountManagerProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState<'ALL' | 'admin' | 'room' | 'tkcs'>('ALL');
@@ -66,6 +76,8 @@ export default function AccountManager({
   // Password reset modal state
   const [editingPasswordUser, setEditingPasswordUser] = useState<User | null>(null);
   const [newPassword, setNewPassword] = useState('');
+  const [showAdminClearConfirm, setShowAdminClearConfirm] = useState(false);
+  const [showAdminResetConfirm, setShowAdminResetConfirm] = useState(false);
 
   const handleRoleChange = (newRole: 'admin' | 'room' | 'tkcs') => {
     setRole(newRole);
@@ -218,6 +230,140 @@ export default function AccountManager({
           </div>
         </div>
       </div>
+
+      {currentUser?.role === 'admin' && (
+        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
+          <div className="flex items-center space-x-2 pb-2.5 border-b border-slate-100">
+            <div className="p-1.5 bg-indigo-50 text-indigo-700 rounded-lg">
+              <Database className="w-4 h-4" />
+            </div>
+            <div className="text-left">
+              <h4 className="text-xs font-black text-slate-900 font-sans uppercase tracking-wider">
+                Quản trị Dữ liệu & Hệ thống
+              </h4>
+              <p className="text-[10px] text-slate-500 font-bold mt-0.5 leading-none">
+                Bảng điều khiển các tiến trình khôi phục, xoá sạch và xuất báo cáo cấp cao của Quản trị viên
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Card 1: EXPORT EXCEL */}
+            <div className="bg-emerald-50/25 rounded-xl border border-emerald-100 p-4.5 flex flex-col justify-between space-y-3.5 text-left">
+              <div className="space-y-1.5">
+                <div className="flex items-center space-x-1.5">
+                  <Download className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span className="text-xs font-extrabold text-slate-900">Xuất Excel Toàn Hệ Thống</span>
+                </div>
+                <p className="text-[11px] text-slate-650 leading-relaxed font-sans font-medium">
+                  Tải xuống tất cả chi tiết giao, trạng thái nộp, điểm và xếp hạng thi đua của 14 đơn vị thống kê cấp huyện sang tệp Excel đa trang tự quản lý.
+                </p>
+              </div>
+              <div>
+                <button
+                  type="button"
+                  onClick={onExportExcel}
+                  className="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-sans text-xs font-extrabold rounded-lg shadow-xs cursor-pointer transition-all active:scale-[0.98] flex items-center justify-center gap-1"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Tải tệp Excel báo cáo</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Card 2: RESET SAMPLE DATA DATA */}
+            <div className="bg-blue-50/25 rounded-xl border border-blue-100 p-4.5 flex flex-col justify-between space-y-3.5 text-left">
+              <div className="space-y-1.5">
+                <div className="flex items-center space-x-1.5">
+                  <RotateCcw className="w-4 h-4 text-blue-600 shrink-0" />
+                  <span className="text-xs font-extrabold text-slate-900">Khôi phục Dữ liệu Mẫu</span>
+                </div>
+                <p className="text-[11px] text-slate-650 leading-relaxed font-sans font-medium">
+                  Hạ nạp lại danh sách báo cáo chỉ tiêu và trạng thái điểm mặc định ban đầu của 14 đơn vị huyện. Toàn bộ tiến độ hiện tại sẽ bị đảo ngược.
+                </p>
+              </div>
+              <div>
+                {!showAdminResetConfirm ? (
+                  <button
+                    type="button"
+                    onClick={() => setShowAdminResetConfirm(true)}
+                    className="w-full py-2 bg-blue-650 hover:bg-blue-550 text-white font-sans text-xs font-extrabold rounded-lg shadow-xs cursor-pointer transition-all active:scale-[0.98] flex items-center justify-center gap-1"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" />
+                    <span>Nạp lại bản mặc định</span>
+                  </button>
+                ) : (
+                  <div className="flex gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (onResetData) onResetData();
+                        setShowAdminResetConfirm(false);
+                      }}
+                      className="flex-1 py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-[11px] rounded-lg transition-all cursor-pointer"
+                    >
+                      Đồng ý
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowAdminResetConfirm(false)}
+                      className="flex-1 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold text-[11px] rounded-lg transition-all cursor-pointer"
+                    >
+                      Hủy bỏ
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Card 3: CLEAR DATA TRASH */}
+            <div className="bg-rose-50/25 rounded-xl border border-rose-100 p-4.5 flex flex-col justify-between space-y-3.5 text-left">
+              <div className="space-y-1.5">
+                <div className="flex items-center space-x-1.5">
+                  <Trash2 className="w-4 h-4 text-rose-600 shrink-0" />
+                  <span className="text-xs font-extrabold text-slate-900">Xóa Sạch Báo Cáo</span>
+                </div>
+                <p className="text-[11px] text-slate-655 leading-relaxed font-sans font-medium">
+                  Giải tỏa trống trơn tất cả danh mục báo cáo chỉ tiêu trong hệ thống. Dành cho Quản trị viên nạp tệp Excel phân giao hoặc chu kỳ mới từ đầu.
+                </p>
+              </div>
+              <div>
+                {!showAdminClearConfirm ? (
+                  <button
+                    type="button"
+                    onClick={() => setShowAdminClearConfirm(true)}
+                    className="w-full py-2 bg-rose-650 hover:bg-rose-550 text-white font-sans text-xs font-extrabold rounded-lg shadow-xs cursor-pointer transition-all active:scale-[0.98] flex items-center justify-center gap-1"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Xoá sạch toàn bộ BC</span>
+                  </button>
+                ) : (
+                  <div className="flex gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (onClearAllData) onClearAllData();
+                        setShowAdminClearConfirm(false);
+                      }}
+                      className="flex-1 py-1.5 bg-rose-600 hover:bg-rose-500 text-white font-extrabold text-[11px] rounded-lg transition-all cursor-pointer"
+                    >
+                      Xác nhận Xóa
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowAdminClearConfirm(false)}
+                      className="flex-1 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold text-[11px] rounded-lg transition-all cursor-pointer"
+                    >
+                      Hủy bỏ
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+          </div>
+        </div>
+      )}
 
       <AnimatePresence>
         {showAddForm && (
@@ -698,6 +844,88 @@ export default function AccountManager({
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* CƠ SỞ DỮ LIỆU & HỆ THỐNG MANAGEMENT CONTROLS - Chỉ Admin được truy cập */}
+      {currentUser.role === 'admin' && (
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 mt-8 space-y-4">
+          <div className="flex items-center space-x-2 text-slate-900 font-extrabold text-sm uppercase tracking-wider border-b border-slate-100 pb-3">
+            <Database className="w-5 h-5 text-indigo-600" />
+            <span>Quản Trị Cơ Sở Dữ Liệu & Hệ Thống</span>
+          </div>
+
+          <p className="text-xs text-slate-500 max-w-2xl font-sans leading-relaxed">
+            Khu vực đặc quyền dành riêng cho Quản trị viên hệ thống để khôi phục trạng thái chuẩn hoặc khởi tạo dọn sạch dữ liệu thi đua của tỉnh Hưng Yên.
+          </p>
+
+          <div className="flex flex-wrap gap-4 pt-2">
+            {onResetData && (
+              <button
+                type="button"
+                onClick={onResetData}
+                className="flex items-center space-x-2 px-4 py-3 text-xs bg-slate-50 hover:bg-slate-100/80 active:scale-[0.98] text-slate-700 hover:text-slate-900 font-sans font-extrabold rounded-xl border border-slate-200 shadow-2xs transition-all cursor-pointer"
+                title="Khôi phục điểm thi đua và danh mục báo cao mặc định"
+              >
+                <RotateCcw className="w-4 h-4 text-indigo-600" />
+                <span>Khôi phục dữ liệu Mặc định</span>
+              </button>
+            )}
+
+            {onClearAllData && (
+              <button
+                type="button"
+                onClick={() => setShowAdminClearConfirm(true)}
+                className="flex items-center space-x-2 px-4 py-3 text-xs bg-rose-50 hover:bg-rose-100 text-rose-700 active:scale-[0.98] font-sans font-extrabold rounded-xl border border-rose-150 shadow-2xs transition-all cursor-pointer"
+                title="Xóa trắng toàn bộ báo cáo"
+              >
+                <Trash2 className="w-4 h-4 text-rose-500" />
+                <span>Xóa sạch toàn bộ Báo cáo</span>
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Admin specific Clear Confirm Modal inside AccountManager */}
+      {showAdminClearConfirm && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl border border-slate-100 overflow-hidden transform transition-all">
+            <div className="bg-linear-to-r from-rose-600 to-rose-700 p-4 flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-white animate-bounce" />
+              <h3 className="text-white font-extrabold text-sm uppercase tracking-wider">CẢNH BÁO CỰC HẠN</h3>
+            </div>
+            <div className="p-5 space-y-4 font-sans text-xs">
+              <p className="text-slate-600 text-xs font-semibold leading-relaxed">
+                Bạn có thực sự muốn <strong className="text-rose-600 underline">XÓA SẠCH</strong> toàn bộ danh mục báo cáo đang giao trong hệ thống không?
+              </p>
+              <p className="text-slate-500 leading-relaxed text-[11px]">
+                Hành động này sẽ xóa hết toàn bộ tiến độ, điểm số và các lượt báo cáo đang hiển thị. Hệ thống sẽ trống rỗng hoàn toàn để bạn nạp tệp Excel mới hoặc thiết lập thủ công từ đầu.
+              </p>
+              
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setShowAdminClearConfirm(false)}
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl transition-all cursor-pointer"
+                >
+                  Hủy bỏ
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (onClearAllData) {
+                      onClearAllData();
+                    }
+                    setShowAdminClearConfirm(false);
+                  }}
+                  className="px-4.5 py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-extrabold rounded-xl transition-all cursor-pointer shadow-md shadow-rose-500/15 text-xs"
+                >
+                  Xác nhận Xóa sạch
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

@@ -63,6 +63,37 @@ export default function Leaderboard({
   return (
     <div className="space-y-6" id="leaderboard-panel">
       
+      {/* CƠ CHẾ TÍNH ĐIỂM & XẾP HẠNG THI ĐUA */}
+      <div className="bg-indigo-50/60 p-5 rounded-2xl border border-indigo-100/80 flex flex-col sm:flex-row shadow-xs gap-4 font-sans text-xs">
+        <div className="p-3 bg-indigo-500 text-white rounded-2xl flex items-center justify-center self-start shadow-md shadow-indigo-500/10 shrink-0">
+          <HelpCircle className="w-5 h-5 text-white" />
+        </div>
+        <div className="space-y-2 text-left">
+          <h4 className="font-extrabold text-indigo-950 uppercase tracking-wide text-[12px]">Hướng dẫn Cơ chế Tính điểm & Xếp hạng Thi đua</h4>
+          <p className="text-indigo-900 leading-relaxed font-semibold">
+            Điểm xếp hạng và xếp hạng được tính toán tự động dựa trên tổng điểm thực tế của toàn bộ các loại báo cáo được giao đối với từng đơn vị:
+          </p>
+          <ul className="list-disc pl-4 space-y-1 text-slate-800 font-medium leading-relaxed">
+            <li>
+              <strong className="text-indigo-950">Định Mức Điểm Chỉ Tiêu:</strong> Mỗi báo cáo nghiệp vụ được phòng ban chuyên môn giao có định mức điểm quy định (Ví dụ: báo cáo tháng là <span className="font-extrabold">20đ</span>, báo cáo quý là <span className="font-extrabold">40đ</span>). Nếu đơn vị được giao 12 báo cáo tháng, tổng định mức điểm tối đa của nhóm báo cáo này là <span className="font-extrabold">12 &times; 20 = 240đ</span>.
+            </li>
+            <li>
+              <strong className="text-indigo-950">Định Mức = Điểm Thời Gian (50%) + Điểm Chất Lượng (50%):</strong>
+              <ul className="list-circle pl-4 mt-0.5 space-y-0.5 text-slate-700">
+                <li><strong className="text-sky-700">Điểm Thời Gian (Tối đa 50% định mức):</strong> Ghi nhận tự động khi nộp đúng hạn hoặc sớm (10đ / 20đ). Nếu nộp trễ hạn, mỗi ngày trễ trừ 1 điểm, khấu trừ tối đa về 0.</li>
+                <li><strong className="text-indigo-750">Điểm Chất Lượng chuyên môn (Tối đa 50% định mức):</strong> Do phòng nghiệp vụ chuyên trách thẩm định chấm dựa trên độ tin cậy và sự chu đáo của biểu mẫu số liệu (10đ / 20đ).</li>
+              </ul>
+            </li>
+            <li>
+              <strong className="text-indigo-950">Chỉ Số Thi Đua Xếp Hạng:</strong> Điểm % thi đua tổng hợp hiển thị là tỷ phần phần trăm của Tổng điểm đạt được chia cho Tổng định mức điểm được giao của tất cả báo cáo:
+              <div className="mt-1.5 p-2 bg-indigo-950/5 text-indigo-950 font-mono font-bold rounded-lg border border-indigo-200/50 inline-block text-[10px]">
+                Chỉ số Thi Đua Đơn Vị (%) = ( Tổng Điểm Thực Tế Đạt Được / Tổng Điểm Định Mức Giao ) &times; 100
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
       {/* Filters bar & Action layout */}
       <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         
@@ -281,26 +312,35 @@ export default function Leaderboard({
 
             {/* Modal master detailed log */}
             <div className="p-6 overflow-y-auto max-h-[500px] space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
-                <div className="bg-slate-50 p-4 rounded-xl text-center">
-                  <span className="text-[10px] text-slate-400 font-sans block block uppercase">Chỉ tiêu Hoàn thành</span>
-                  <span className="text-xl font-bold font-mono text-slate-700 mt-1 block">
-                    {selectedUnitSubmissions.filter(s => s.Ngay_Nop !== null).length} / {selectedUnitSubmissions.length}
-                  </span>
-                </div>
-                <div className="bg-slate-50 p-4 rounded-xl text-center">
-                  <span className="text-[10px] text-slate-400 font-sans block block uppercase font-medium">Nộp trễ hạn</span>
-                  <span className="text-xl font-bold font-mono text-amber-600 mt-1 block">
-                    {selectedUnitSubmissions.filter(s => (s.So_Ngay_Tre ?? 0) > 0).length} lần
-                  </span>
-                </div>
-                <div className="bg-slate-50 p-4 rounded-xl text-center">
-                  <span className="text-[10px] text-slate-400 font-sans block block uppercase">Điểm thi đua trung bình</span>
-                  <span className="text-xl font-bold font-mono text-slate-900 mt-1 block">
-                    {(selectedUnitSubmissions.reduce((sum, s) => sum + (s.Tong_Diem ?? 0), 0) / selectedUnitSubmissions.length).toFixed(1)}đ
-                  </span>
-                </div>
-              </div>
+              {(() => {
+                const totalDinhMucVal = selectedUnitSubmissions.reduce((sum, s) => sum + s.Diem_Dinh_Muc, 0);
+                const totalTongDiemVal = selectedUnitSubmissions.reduce((sum, s) => sum + (s.Tong_Diem ?? 0), 0);
+                const emulationIndexVal = totalDinhMucVal > 0 ? (totalTongDiemVal / totalDinhMucVal) * 105 : 0; // Scaled proportional count index
+                const realPercent = Math.min(100, Math.round((totalTongDiemVal / totalDinhMucVal) * 100 * 10) / 10);
+
+                return (
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+                    <div className="bg-slate-50 p-4 rounded-xl text-center">
+                      <span className="text-[10px] text-slate-400 font-sans block uppercase">Hoàn thành chỉ tiêu</span>
+                      <span className="text-xl font-bold font-mono text-slate-705 mt-1 block">
+                        {selectedUnitSubmissions.filter(s => s.Ngay_Nop !== null).length} / {selectedUnitSubmissions.length} báo cáo
+                      </span>
+                    </div>
+                    <div className="bg-slate-50 p-4 rounded-xl text-center">
+                      <span className="text-[10px] text-slate-400 font-sans block uppercase font-semibold text-indigo-700">Tổng điểm thực đạt</span>
+                      <span className="text-xl font-bold font-mono text-indigo-800 mt-1 block">
+                        {totalTongDiemVal.toFixed(1)}đ / {totalDinhMucVal}đ
+                      </span>
+                    </div>
+                    <div className="bg-slate-50 p-4 rounded-xl text-center">
+                      <span className="text-[10px] text-emerald-650 font-sans block uppercase font-extrabold">Chỉ số thi đua đạt</span>
+                      <span className="text-xl font-black font-mono text-emerald-600 mt-1 block">
+                        {realPercent}%
+                      </span>
+                    </div>
+                  </div>
+                );
+              })()}
 
               {/* Submissions detailed list log */}
               <div className="overflow-x-auto rounded-xl border border-slate-100">

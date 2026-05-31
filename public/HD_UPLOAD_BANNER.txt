@@ -1,0 +1,9 @@
+HƯỚNG DẪN TẢI LÊN ẢNH BANNER DỰ ÁN (HƯNG YÊN):
+
+1. Chuẩn bị ảnh banner của bạn.
+2. Đặt tên tệp ảnh chính xác là: banner.png
+3. Sử dụng công cụ quản lý tệp tin (File Explorer) ở thanh bên trái của giao diện AI Studio.
+4. Kéo và thả hoặc tải tệp "banner.png" vào chính thư mục "public" này.
+5. Hệ thống sẽ tự động quét và hiển thị ảnh banner tuyệt đẹp này ở tiêu đề trang web mà không cần nén dung lượng hay lo ngại đầy bộ nhớ trình duyệt!
+
+Chúc bạn thực hiện thành công!

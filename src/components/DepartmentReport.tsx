@@ -10,9 +10,10 @@ import { ShieldCheck, CheckSquare, Clock, AlertOctagon, Layers } from 'lucide-re
 interface DepartmentReportProps {
   submissions: ReportSubmission[];
   departments: Department[];
+  onClickOverdueDept?: (deptCode: string) => void;
 }
 
-export default function DepartmentReport({ submissions, departments }: DepartmentReportProps) {
+export default function DepartmentReport({ submissions, departments, onClickOverdueDept }: DepartmentReportProps) {
   
   // Calculate aggregate performance metrics for each department
   const deptsStats = departments.map(d => {
@@ -104,8 +105,11 @@ export default function DepartmentReport({ submissions, departments }: Departmen
                   </div>
                 </div>
 
-                <div className="bg-slate-50/50 p-2.5 rounded-lg border border-slate-100 flex items-center space-x-2 col-span-2">
-                  <AlertOctagon className="w-4 h-4 text-rose-500 shrink-0" />
+                <div 
+                  onClick={() => onClickOverdueDept && onClickOverdueDept(dept.code)}
+                  className={`bg-slate-50/50 p-2.5 rounded-lg border border-slate-100 flex items-center space-x-2 col-span-2 ${onClickOverdueDept ? 'cursor-pointer hover:bg-rose-50 hover:border-rose-150 group transition-all' : ''}`}
+                >
+                  <AlertOctagon className="w-4 h-4 text-rose-500 shrink-0 group-hover:animate-bounce" />
                   <div>
                     <span className="text-[10px] text-slate-400 leading-none block uppercase font-medium">⚠️ Quá hạn cực điểm</span>
                     <span className="font-mono font-bold text-rose-600 block mt-0.5">{dept.overdueCount} chỉ tiêu chưa nộp</span>

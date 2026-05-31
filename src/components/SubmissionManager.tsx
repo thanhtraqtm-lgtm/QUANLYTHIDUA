@@ -68,13 +68,16 @@ export default function SubmissionManager({
   const currentUnitFilter = isTkcs ? (currentUser?.unitCode || 'ALL') : unitFilter;
 
 
-  // Selected Row for grading
   const [editingSubmission, setEditingSubmission] = useState<ReportSubmission | null>(null);
   const [editNgayNop, setEditNgayNop] = useState('');
   const [editDiemChatLuong, setEditDiemChatLuong] = useState(0);
   const [editDiemThoiGian, setEditDiemThoiGian] = useState(0);
   const [editFileDinhKem, setEditFileDinhKem] = useState<string | null>(null);
   const [editNhanXet, setEditNhanXet] = useState('');
+
+  // Confirmation overlays state
+  const [submissionToDelete, setSubmissionToDelete] = useState<ReportSubmission | null>(null);
+  const [showAllUnitsAssignConfirm, setShowAllUnitsAssignConfirm] = useState<boolean>(false);
 
   // New report creation form states
   const [newReportTitle, setNewReportTitle] = useState('');
@@ -93,6 +96,37 @@ export default function SubmissionManager({
     }
   };
 
+  const executeBulkAssign = () => {
+    if (!onAddNewSubmission) return;
+
+    const deptObj = departments.find(d => d.Ma_Phong === newReportDept);
+    const tenPhong = deptObj ? deptObj.Ten_Phong : 'Phòng nghiệp vụ';
+
+    units.forEach(u => {
+      onAddNewSubmission({
+        Ma_DV: u.Ma_DV,
+        Ten_Don_Vi: u.Ten_Don_Vi,
+        Vung: u.Vung,
+        Ma_Phong: newReportDept,
+        Ten_Phong: tenPhong,
+        Ten_Bao_Cao: newReportTitle.trim(),
+        Loai_BC: newReportFreq,
+        Han_Nop: newReportDeadline,
+        Ngay_Nop: null,
+        Diem_Thoi_Gian: 0,
+        Diem_Chat_Luong: null,
+        Diem_Dinh_Muc: newReportMaxPoints,
+        Tong_Diem: null,
+        So_Ngay_Tre: null,
+        Nhan_Xet: `Được giao bổ sung đồng loạt bởi cán bộ quản trị tỉnh.`
+      });
+    });
+    alert(`Giao chỉ tiêu báo cáo đồng loạt tới 14 Chi cục Thống kê cấp huyện thành công!`);
+    setNewReportTitle('');
+    setIsDeptManuallySelected(false);
+    setShowAllUnitsAssignConfirm(false);
+  };
+
   const handleAssignNewSubmission = () => {
     if (!newReportTitle.trim()) {
       alert('Vui lòng nhập tên báo cáo nghiệp vụ chuyên môn.');
@@ -108,30 +142,7 @@ export default function SubmissionManager({
     const tenPhong = deptObj ? deptObj.Ten_Phong : 'Phòng nghiệp vụ';
 
     if (newReportUnit === 'ALL') {
-      if (window.confirm(`Xác nhận phân công đồng loạt báo cáo "${newReportTitle}" cho cả 14 đơn vị trực thuộc Thống kê cấp huyện?`)) {
-        units.forEach(u => {
-          onAddNewSubmission({
-            Ma_DV: u.Ma_DV,
-            Ten_Don_Vi: u.Ten_Don_Vi,
-            Vung: u.Vung,
-            Ma_Phong: newReportDept,
-            Ten_Phong: tenPhong,
-            Ten_Bao_Cao: newReportTitle.trim(),
-            Loai_BC: newReportFreq,
-            Han_Nop: newReportDeadline,
-            Ngay_Nop: null,
-            Diem_Thoi_Gian: 0,
-            Diem_Chat_Luong: null,
-            Diem_Dinh_Muc: newReportMaxPoints,
-            Tong_Diem: null,
-            So_Ngay_Tre: null,
-            Nhan_Xet: `Được giao bổ sung đồng loạt bởi cán bộ quản trị tỉnh.`
-          });
-        });
-        alert(`Giao chỉ tiêu báo cáo đồng loạt tới 14 Chi cục Thống kê cấp huyện thành công!`);
-        setNewReportTitle('');
-        setIsDeptManuallySelected(false);
-      }
+      setShowAllUnitsAssignConfirm(true);
     } else {
       const unitObj = units.find(u => u.Ma_DV === newReportUnit);
       if (!unitObj) return;
@@ -408,7 +419,7 @@ export default function SubmissionManager({
                         <td className="py-4 px-3 text-center">
                           {row.Tong_Diem !== null ? (
                             <span className="font-mono font-extrabold text-slate-800 bg-slate-100 px-2 py-1 rounded-md text-xs">
-                              {row.Tong_Diem}đ
+                              {row.Tong_Diem}
                             </span>
                           ) : (
                             <span className="text-slate-400 font-sans">-</span>
@@ -455,14 +466,10 @@ export default function SubmissionManager({
                                   <span>Xem</span>
                                 </button>
                               )}
-                              {currentUser?.role === 'admin' && onDeleteSubmission && (
+                              {(currentUser?.role === 'admin' || (currentUser?.role === 'room' && row.Ma_Phong === currentUser?.deptCode)) && onDeleteSubmission && (
                                 <button 
-                                  onClick={() => {
-                                    if (window.confirm(`Xác nhận xóa bỏ báo cáo giao số ID ${row.ID}: "${row.Ten_Bao_Cao}" giao cho đơn vị ${row.Ten_Don_Vi}?`)) {
-                                      onDeleteSubmission(row.ID);
-                                    }
-                                  }}
-                                  className="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 hover:text-rose-800 rounded-lg transition-colors cursor-pointer shrink-0"
+                                  onClick={() => setSubmissionToDelete(row)}
+                                  className="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 hover:text-rose-800 rounded-lg transition-colors cursor-pointer shrink-0 border border-rose-100/50"
                                   title="Xóa dòng báo cáo giao này"
                                 >
                                   <Trash2 className="w-3.5 h-3.5" />
@@ -680,7 +687,7 @@ export default function SubmissionManager({
                   <div className="space-y-1">
                     <span className="text-[10px] text-slate-400 font-bold font-sans uppercase block">Điểm Thời Gian Nộp</span>
                     <span className="text-xs font-mono font-extrabold text-slate-800">
-                      {editingSubmission.Diem_Thoi_Gian !== null ? `${editingSubmission.Diem_Thoi_Gian}đ` : 'Chưa xếp điểm nộp'}
+                      {editingSubmission.Diem_Thoi_Gian !== null ? editingSubmission.Diem_Thoi_Gian : 'Chưa xếp điểm nộp'}
                     </span>
                   </div>
 
@@ -688,10 +695,10 @@ export default function SubmissionManager({
                     <span className="text-[10px] text-slate-400 font-bold font-sans uppercase block">Điểm Chất Lượng Thẩm Định</span>
                     <div className="flex items-center space-x-2">
                       <span className={`text-xs font-mono font-extrabold ${editingSubmission.Diem_Chat_Luong !== null ? 'text-slate-800' : 'text-slate-400 font-normal italic'}`}>
-                        {editingSubmission.Diem_Chat_Luong !== null ? `${editingSubmission.Diem_Chat_Luong}đ` : 'Chờ giám khảo thẩm định...'}
+                        {editingSubmission.Diem_Chat_Luong !== null ? editingSubmission.Diem_Chat_Luong : 'Chờ giám khảo thẩm định...'}
                       </span>
                       {editingSubmission.Diem_Chat_Luong !== null && (
-                        <span className="text-[10px] text-slate-400">/ Thang {editingSubmission.Diem_Dinh_Muc}đ</span>
+                        <span className="text-[10px] text-slate-400">/ Thang {editingSubmission.Diem_Dinh_Muc}</span>
                       )}
                     </div>
                   </div>
@@ -730,7 +737,7 @@ export default function SubmissionManager({
                         disabled={!canGradeEditing}
                         className="w-20 px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl font-mono font-bold text-slate-800 focus:ring-2 focus:ring-sky-500/20 disabled:opacity-60 disabled:cursor-not-allowed text-center outline-none"
                       />
-                      <span className="text-[11px] text-slate-500 font-sans">/ Max định mức: <span className="font-bold text-slate-700 block sm:inline">{editingSubmission.Diem_Dinh_Muc}đ</span></span>
+                      <span className="text-[11px] text-slate-500 font-sans">/ Max định mức: <span className="font-bold text-slate-700 block sm:inline">{editingSubmission.Diem_Dinh_Muc}</span></span>
                     </div>
                     <p className="text-[9px] text-slate-400 font-sans leading-normal italic">
                       * Đề xuất dựa trên ngày nộp. Giám khảo tự điều chỉnh nhập thủ công để cộng phạt điểm thời hạn theo đúng quy chế thi đua.
@@ -751,7 +758,7 @@ export default function SubmissionManager({
                         disabled={!canGradeEditing}
                         className="w-20 px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl font-mono font-bold text-slate-800 outline-none focus:ring-2 focus:ring-sky-500/20 disabled:opacity-60 disabled:cursor-not-allowed text-center"
                       />
-                      <span className="text-[11px] text-slate-500 font-sans">/ Max: <span className="font-bold text-slate-700">{editingSubmission.Diem_Dinh_Muc}</span>đ</span>
+                      <span className="text-[11px] text-slate-500 font-sans">/ Max: <span className="font-bold text-slate-700">{editingSubmission.Diem_Dinh_Muc}</span></span>
                     </div>
 
                     {/* Direct Dial presets shortcuts helper */}
@@ -940,16 +947,16 @@ export default function SubmissionManager({
 
                   <div className="space-y-1">
                     <label className="text-[10px] text-slate-400 font-bold font-sans uppercase block font-sans">Điểm chuẩn (Đ.mức)</label>
-                    <select 
+                    <input 
+                      type="number"
+                      min="1"
+                      max="1000"
+                      step="any"
                       value={newReportMaxPoints}
                       onChange={(e) => setNewReportMaxPoints(Number(e.target.value))}
                       className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 text-slate-700 outline-none font-sans font-mono"
-                    >
-                      <option value="30">30 điểm</option>
-                      <option value="20">20 điểm</option>
-                      <option value="40">40 điểm</option>
-                      <option value="10">10 điểm</option>
-                    </select>
+                      placeholder="Nhập số điểm định mức..."
+                    />
                   </div>
                 </div>
 
@@ -993,6 +1000,103 @@ export default function SubmissionManager({
           )
         )}
       </div>
+
+      {showAllUnitsAssignConfirm && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl border border-slate-100 overflow-hidden transform transition-all">
+            <div className="bg-linear-to-r from-sky-500 to-indigo-650 p-4 flex items-center gap-2">
+              <PlusCircle className="w-5 h-5 text-white animate-pulse" />
+              <h3 className="text-white font-extrabold text-sm uppercase tracking-wider">Xác nhận phân công đồng loạt</h3>
+            </div>
+            <div className="p-5 space-y-4 font-sans text-xs text-left">
+              <p className="text-slate-600 leading-relaxed font-semibold">
+                Hệ thống ghi nhận bạn đang yêu cầu phân công đồng loạt báo cáo sau cho <strong className="text-sky-600">tất cả 14 Chi cục Thống kê cấp huyện</strong>:
+              </p>
+              <div className="p-3 bg-sky-50 border border-sky-100 text-sky-900 rounded-xl space-y-1">
+                <div>
+                  <span className="text-[10px] text-slate-400 font-bold block uppercase font-mono">Tên báo cáo:</span>
+                  <strong className="text-slate-900">{newReportTitle}</strong>
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-400 font-bold block uppercase font-mono">Phòng quản lý:</span>
+                  <span className="font-medium text-slate-700">{departments.find(d => d.Ma_Phong === newReportDept)?.Ten_Phong || 'Phòng nghiệp vụ'}</span>
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-400 font-bold block uppercase font-mono">Định mức / Hạn nộp:</span>
+                  <strong className="text-indigo-900">{newReportMaxPoints} — Hạn: {newReportDeadline}</strong>
+                </div>
+              </div>
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 text-xs">
+                <button
+                  type="button"
+                  onClick={() => setShowAllUnitsAssignConfirm(false)}
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl transition-all cursor-pointer"
+                >
+                  Hủy bỏ
+                </button>
+                <button
+                  type="button"
+                  onClick={executeBulkAssign}
+                  className="px-4.5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold rounded-xl transition-all cursor-pointer shadow-md shadow-indigo-500/15"
+                >
+                  Xác nhận phân công đồng loạt
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {submissionToDelete && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl border border-slate-100 overflow-hidden">
+            <div className="bg-linear-to-r from-rose-600 to-rose-700 p-4 flex items-center gap-2">
+              <Trash2 className="w-5 h-5 text-white animate-bounce" />
+              <h3 className="text-white font-extrabold text-sm uppercase tracking-wider">Xác nhận xóa bỏ báo cáo</h3>
+            </div>
+            <div className="p-5 space-y-4 font-sans text-xs">
+              <p className="text-slate-600 leading-relaxed font-semibold">
+                Bạn có thực sự muốn xóa bỏ vĩnh viễn báo cáo được giao sau đây không? Hãy lưu ý rằng hành động này không thể khôi phục tự động.
+              </p>
+              <div className="p-3 bg-rose-50 border border-rose-100/80 rounded-xl space-y-1.5 text-slate-700">
+                <div>
+                  <span className="text-[10px] text-slate-400 font-bold block uppercase font-mono">ID bản ghi:</span>
+                  <strong className="text-rose-900"># {submissionToDelete.ID}</strong>
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-400 font-bold block uppercase font-mono">Tên báo cáo:</span>
+                  <strong className="text-slate-900">{submissionToDelete.Ten_Bao_Cao}</strong>
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-400 font-bold block uppercase font-mono">Đơn vị nhận giao:</span>
+                  <strong className="text-slate-900">{submissionToDelete.Ten_Don_Vi}</strong>
+                </div>
+              </div>
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setSubmissionToDelete(null)}
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl transition-all cursor-pointer"
+                >
+                  Hủy bỏ
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (onDeleteSubmission) {
+                      onDeleteSubmission(submissionToDelete.ID);
+                    }
+                    setSubmissionToDelete(null);
+                  }}
+                  className="px-4.5 py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-extrabold rounded-xl transition-all cursor-pointer shadow-md shadow-rose-500/10"
+                >
+                  Xác nhận Xóa
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );
