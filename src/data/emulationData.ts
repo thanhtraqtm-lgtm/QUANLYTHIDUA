@@ -172,7 +172,7 @@ export function generateInitialSubmissions(): ReportSubmission[] {
               const qualityRatio = 0.85 + (Math.random() * 0.15);
               diemChatLuong = Math.round(maxChatLuong * qualityRatio * 10) / 10;
               tongDiem = Math.round((diemThoiGian + diemChatLuong) * 10) / 10;
-              nhanXet = "Nộp đúng hạn đạt kết quả xuất sắc. Đối chiếu biểu số liệu nghiệp vụ sạch sẽ.";
+              nhanXet = "Nộp đúng hạn.";
             }
           } else {
             // Past deadline and still NOT submitted
