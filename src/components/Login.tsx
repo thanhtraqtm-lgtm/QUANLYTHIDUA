@@ -146,7 +146,7 @@ export default function Login({ onLoginSuccess, units, accounts }: LoginProps) {
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     className="w-full pl-9 pr-3 py-2.5 text-xs text-slate-800 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-sky-500/20 font-medium placeholder-slate-400"
-                    placeholder="Nhập tên tài khoản (vd: admin, phong_th, tkph,...)"
+                    placeholder="Nhập tên tài khoản (vd:phong_th,phong_cn tkph,...)"
                   />
                   <UserIcon className="w-4 h-4 text-slate-400 absolute left-3 top-3.5" />
                 </div>
@@ -163,7 +163,7 @@ export default function Login({ onLoginSuccess, units, accounts }: LoginProps) {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="w-full pl-9 pr-10 py-2.5 text-xs text-slate-800 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-sky-500/20 font-mono"
-                    placeholder="Mật khẩu (mặc định: 123)"
+                    placeholder="Mật khẩu (mặc định:...)"
                   />
                   <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-3.5" />
                   <button 
