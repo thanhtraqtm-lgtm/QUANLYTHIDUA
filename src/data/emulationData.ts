@@ -6,27 +6,27 @@
 import { Unit, ReportSubmission, Department } from '../types';
 
 export const UNITS_DATA: Unit[] = [
-  { Ma_DV: 'TKPH', Ten_Don_Vi: 'Thống kê Cơ Sở TP. Hưng Yên', Vung: 'Khu vực 1' },
-  { Ma_DV: 'TKNQ', Ten_Don_Vi: 'Thống kê Cơ Sở huyện Văn Lâm', Vung: 'Khu vực 1' },
+  { Ma_DV: 'TKPH', Ten_Don_Vi: 'Thống kê Cơ Sở Phố Hiến', Vung: 'Khu vực 1' },
+  { Ma_DV: 'TKNQ', Ten_Don_Vi: 'Thống kê Cơ Sở Như Quỳnh', Vung: 'Khu vực 1' },
   { Ma_DV: 'TKYM', Ten_Don_Vi: 'Thống kê Cơ Sở huyện Yên Mỹ', Vung: 'Khu vực 1' },
-  { Ma_DV: 'TKMH', Ten_Don_Vi: 'Thống kê Cơ Sở thị xã Mỹ Hào', Vung: 'Khu vực 1' },
-  { Ma_DV: 'TKKC', Ten_Don_Vi: 'Thống kê Cơ Sở huyện Khoái Châu', Vung: 'Khu vực 1' },
-  { Ma_DV: 'TKLB', Ten_Don_Vi: 'Thống kê Cơ Sở huyện Kim Động', Vung: 'Khu vực 1' },
-  { Ma_DV: 'TKHHT', Ten_Don_Vi: 'Thống kê Cơ Sở huyện Phù Cừ', Vung: 'Khu vực 1' },
-  { Ma_DV: 'TKQP', Ten_Don_Vi: 'Thống kê Cơ Sở huyện Quỳnh Phụ', Vung: 'Khu vực 2' },
-  { Ma_DV: 'TKHH', Ten_Don_Vi: 'Thống kê Cơ Sở huyện Hưng Hà', Vung: 'Khu vực 2' },
-  { Ma_DV: 'TKDH', Ten_Don_Vi: 'Thống kê Cơ Sở huyện Đông Hưng', Vung: 'Khu vực 2' },
-  { Ma_DV: 'TKTT', Ten_Don_Vi: 'Thống kê Cơ Sở huyện Thái Thụy', Vung: 'Khu vực 2' },
-  { Ma_DV: 'TKTH', Ten_Don_Vi: 'Thống kê Cơ Sở huyện Tiền Hải', Vung: 'Khu vực 2' },
-  { Ma_DV: 'TKKX', Ten_Don_Vi: 'Thống kê Cơ Sở huyện Kiến Xương', Vung: 'Khu vực 2' },
-  { Ma_DV: 'TKVT', Ten_Don_Vi: 'Thống kê Cơ Sở huyện Vũ Thư', Vung: 'Khu vực 2' }
+  { Ma_DV: 'TKMH', Ten_Don_Vi: 'Thống kê Cơ Sở Mỹ Hào', Vung: 'Khu vực 1' },
+  { Ma_DV: 'TKKC', Ten_Don_Vi: 'Thống kê Cơ Sở Khoái Châu', Vung: 'Khu vực 1' },
+  { Ma_DV: 'TKLB', Ten_Don_Vi: 'Thống kê Cơ Sở Lương Bằng', Vung: 'Khu vực 1' },
+  { Ma_DV: 'TKHHT', Ten_Don_Vi: 'Thống kê Cơ Sở Hoàng Hoa Thám', Vung: 'Khu vực 1' },
+  { Ma_DV: 'TKQP', Ten_Don_Vi: 'Thống kê Cơ Sở Quỳnh Phụ', Vung: 'Khu vực 2' },
+  { Ma_DV: 'TKHH', Ten_Don_Vi: 'Thống kê Cơ Sở Hưng Hà', Vung: 'Khu vực 2' },
+  { Ma_DV: 'TKDH', Ten_Don_Vi: 'Thống kê Cơ Sở Đông Hưng', Vung: 'Khu vực 2' },
+  { Ma_DV: 'TKTT', Ten_Don_Vi: 'Thống kê Cơ Sở Thái Thụy', Vung: 'Khu vực 2' },
+  { Ma_DV: 'TKTH', Ten_Don_Vi: 'Thống kê Cơ Sở Tiền Hải', Vung: 'Khu vực 2' },
+  { Ma_DV: 'TKKX', Ten_Don_Vi: 'Thống kê Cơ Sở Kiến Xương', Vung: 'Khu vực 2' },
+  { Ma_DV: 'TKVT', Ten_Don_Vi: 'Thống kê Cơ Sở Vũ Thư', Vung: 'Khu vực 2' }
 ];
 
 export const DEPARTMENTS_DATA: Department[] = [
   { Ma_Phong: 'P_TH', Ten_Phong: 'Phòng Thống kê Tổng hợp' },
-  { Ma_Phong: 'P_CN', Ten_Phong: 'Phòng Thống kê Công nghiệp' },
+  { Ma_Phong: 'P_CN', Ten_Phong: 'Phòng Thống kê Công nghiệp & Xây Dựng' },
   { Ma_Phong: 'P_NNXH', Ten_Phong: 'Phòng Thống kê Nông nghiệp và Xã hội' },
-  { Ma_Phong: 'P_DV', Ten_Phong: 'Phòng Thống kê Thương mại - Dịch vụ' },
+  { Ma_Phong: 'P_DV', Ten_Phong: 'Phòng Thống kê Thương mại - Dịch vụ Giá' },
   { Ma_Phong: 'P_TCHC', Ten_Phong: 'Phòng Tổ Chức Hành Chính' }
 ];
 
