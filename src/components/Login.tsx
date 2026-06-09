@@ -110,7 +110,7 @@ export default function Login({ onLoginSuccess, units, accounts }: LoginProps) {
         <div className="flex flex-col items-center text-center">
           <div className="mb-4">
             <img 
-              src="/ten-file-logo-cua-ban.png" 
+              src="/logo.png" 
               alt="Logo" 
               className="h-16 w-16 object-contain"
           </div>
