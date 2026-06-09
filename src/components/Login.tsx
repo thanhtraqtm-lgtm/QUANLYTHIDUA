@@ -121,7 +121,7 @@ export default function Login({ onLoginSuccess, units, accounts }: LoginProps) {
             Đăng nhập hệ thống thi đua
           </h2>
           <p className="mt-1 text-xs text-slate-500 max-w-sm font-sans px-4">
-            Cổng thông tin tổng quan, giao chỉ tiêu số liệu và đánh giá thời hạn nộp báo cáo cho các Đơn vị Thống kê.
+            Hệ thống giao kế hoạch công tác và đánh giá thời hạn nộp báo cáo của các đơn vị Thống kê cơ sở .
           </p>
         </div>
       </div>
