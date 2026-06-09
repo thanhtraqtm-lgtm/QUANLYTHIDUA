@@ -108,8 +108,11 @@ export default function Login({ onLoginSuccess, units, accounts }: LoginProps) {
 
       <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10">
         <div className="flex flex-col items-center text-center">
-          <div className="bg-gradient-to-tr from-sky-500 to-indigo-600 p-3.5 rounded-2xl text-white shadow-xl shadow-sky-500/10 mb-4 scale-105">
-            <Trophy className="h-7 w-7" />
+          <div className="mb-4">
+            <img 
+              src="/ten-file-logo-cua-ban.png" 
+              alt="Logo" 
+              className="h-16 w-16 object-contain"
           </div>
           <span className="text-[10px] text-sky-600 uppercase tracking-widest font-extrabold bg-sky-50 border border-sky-150 px-3 py-1 rounded-full font-sans">
             Thống kê Tỉnh Hưng Yên
