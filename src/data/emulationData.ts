@@ -8,7 +8,7 @@ import { Unit, ReportSubmission, Department } from '../types';
 export const UNITS_DATA: Unit[] = [
   { Ma_DV: 'TKPH', Ten_Don_Vi: 'Thống kê Cơ Sở Phố Hiến', Vung: 'Khu vực 1' },
   { Ma_DV: 'TKNQ', Ten_Don_Vi: 'Thống kê Cơ Sở Như Quỳnh', Vung: 'Khu vực 1' },
-  { Ma_DV: 'TKYM', Ten_Don_Vi: 'Thống kê Cơ Sở huyện Yên Mỹ', Vung: 'Khu vực 1' },
+  { Ma_DV: 'TKYM', Ten_Don_Vi: 'Thống kê Cơ Sở Yên Mỹ', Vung: 'Khu vực 1' },
   { Ma_DV: 'TKMH', Ten_Don_Vi: 'Thống kê Cơ Sở Mỹ Hào', Vung: 'Khu vực 1' },
   { Ma_DV: 'TKKC', Ten_Don_Vi: 'Thống kê Cơ Sở Khoái Châu', Vung: 'Khu vực 1' },
   { Ma_DV: 'TKLB', Ten_Don_Vi: 'Thống kê Cơ Sở Lương Bằng', Vung: 'Khu vực 1' },
@@ -24,9 +24,9 @@ export const UNITS_DATA: Unit[] = [
 
 export const DEPARTMENTS_DATA: Department[] = [
   { Ma_Phong: 'P_TH', Ten_Phong: 'Phòng Thống kê Tổng hợp' },
-  { Ma_Phong: 'P_CN', Ten_Phong: 'Phòng Thống kê Công nghiệp & Xây Dựng' },
+  { Ma_Phong: 'P_CN', Ten_Phong: 'Phòng Thống kê Công nghiệp' },
   { Ma_Phong: 'P_NNXH', Ten_Phong: 'Phòng Thống kê Nông nghiệp và Xã hội' },
-  { Ma_Phong: 'P_DV', Ten_Phong: 'Phòng Thống kê Thương mại - Dịch vụ Giá' },
+  { Ma_Phong: 'P_DV', Ten_Phong: 'Phòng Thống kê Thương mại - Dịch vụ' },
   { Ma_Phong: 'P_TCHC', Ten_Phong: 'Phòng Tổ Chức Hành Chính' }
 ];
 
@@ -172,7 +172,7 @@ export function generateInitialSubmissions(): ReportSubmission[] {
               const qualityRatio = 0.85 + (Math.random() * 0.15);
               diemChatLuong = Math.round(maxChatLuong * qualityRatio * 10) / 10;
               tongDiem = Math.round((diemThoiGian + diemChatLuong) * 10) / 10;
-              nhanXet = "Nộp đúng hạn.";
+              nhanXet = "Nộp đúng hạn đạt kết quả xuất sắc. Đối chiếu biểu số liệu nghiệp vụ sạch sẽ.";
             }
           } else {
             // Past deadline and still NOT submitted

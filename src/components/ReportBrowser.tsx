@@ -374,7 +374,7 @@ export default function ReportBrowser({
         <div className="relative pt-2">
           <input 
             type="text"
-            placeholder="Tìm nhanh theo từ khóa tên báo cáo, tên huyện, mã chi cục..."
+            placeholder="Tìm nhanh theo từ khóa tên báo cáo, tên đơn vị, mã đơn vị..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-10 pr-4 py-2.5 text-xs text-slate-800 bg-slate-50/50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500/20 transition-all font-sans"
@@ -632,7 +632,7 @@ export default function ReportBrowser({
                       <p className="font-extrabold text-slate-800 leading-snug mt-1">{editingReport.Ten_Bao_Cao}</p>
                     </div>
                     <div>
-                      <span className="text-slate-400 font-bold block uppercase text-[9px] font-mono leading-none">Đơn vị huyện / chi cục</span>
+                      <span className="text-slate-400 font-bold block uppercase text-[9px] font-mono leading-none">Đơn vị Thống kê</span>
                       <p className="font-extrabold text-slate-800 leading-snug mt-1">{editingReport.Ten_Don_Vi} ({editingReport.Ma_DV})</p>
                     </div>
                   </div>

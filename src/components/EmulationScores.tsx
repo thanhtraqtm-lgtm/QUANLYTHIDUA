@@ -289,11 +289,11 @@ export default function EmulationScores({ submissions, units, departments }: Emu
               Công cụ Lọc đa chiều
             </span>
           </div>
-          <h2 className="text-xl md:text-2xl font-black mt-2 tracking-tight">
+          <h2 className="text-lg md:text-xl font-bold mt-2 tracking-tight">
             TRA CỨU & PHÂN TÍCH ĐIỂM THI ĐUA ĐỊA PHƯƠNG
           </h2>
-          <p className="text-xs text-slate-300 mt-1 max-w-3xl leading-relaxed">
-            Xem điểm thi đua theo thang phần trăm đổi mới dựa trên chỉ số báo cáo hoàn thành chuyên môn. Lọc chi tiết theo địa bàn vùng, từng đơn vị huyện thị, phòng chuyên môn giao việc, hoặc phân tích sâu theo lĩnh vực phụ trách đặc thù.
+          <p className="text-[11.5px] text-slate-300 mt-1 max-w-3xl leading-relaxed">
+            Xem điểm thi đua theo thang phần trăm đổi mới dựa trên chỉ số báo cáo hoàn thành chuyên môn. Lọc chi tiết theo địa bàn vùng, từng đơn vị thống kê, phòng chuyên môn giao việc, hoặc phân tích sâu theo lĩnh vực phụ trách đặc thù.
           </p>
         </div>
       </div>
@@ -303,7 +303,7 @@ export default function EmulationScores({ submissions, units, departments }: Emu
         <div className="flex items-center justify-between pb-3 border-b border-slate-100">
           <div className="flex items-center space-x-2">
             <Layers className="w-5 h-5 text-sky-600" />
-            <h3 className="text-sm font-extrabold text-slate-900 uppercase tracking-wider">Bộ lọc tính điểm liên thông</h3>
+            <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Bộ lọc tính điểm liên thông</h3>
           </div>
           <button 
             onClick={resetAllFilters}
@@ -345,7 +345,7 @@ export default function EmulationScores({ submissions, units, departments }: Emu
               onChange={(e) => setSelectedUnit(e.target.value)}
               className="w-full px-3 py-2.5 text-xs sm:text-sm bg-slate-50 border border-slate-300 rounded-xl focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/10 text-slate-900 font-sans font-semibold cursor-pointer shadow-xs"
             >
-              <option value="ALL">👉 Tất cả Đơn vị cấp huyện (14 Chi cục)</option>
+              <option value="ALL">👉 Tất cả Đơn vị Thống kê (14 Đơn vị)</option>
               {units
                 .filter(u => selectedRegion === 'ALL' || u.Vung === selectedRegion)
                 .map(u => (
@@ -406,10 +406,10 @@ export default function EmulationScores({ submissions, units, departments }: Emu
           </div>
           <input
             type="text"
-            placeholder="Tìm kiếm nhanh tên chi cục hoặc mã đơn vị cần cứu hộ dữ liệu..."
+            placeholder="Tìm kiếm nhanh tên đơn vị hoặc mã đơn vị cần tra cứu..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 text-xs sm:text-sm text-slate-900 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all font-sans font-medium placeholder:text-slate-400"
+            className="w-full pl-10 pr-4 py-3 text-xs sm:text-sm text-slate-800 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all font-sans font-normal placeholder:text-slate-400"
           />
         </div>
       </div>
@@ -471,13 +471,13 @@ export default function EmulationScores({ submissions, units, departments }: Emu
       <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-4">
           <div>
-            <span className="text-[10px] text-slate-400 font-mono tracking-wider font-extrabold uppercase">Biểu đồ Trực quan</span>
-            <h4 className="text-xs font-extrabold text-slate-800 uppercase tracking-tight flex items-center gap-1.5">
+            <span className="text-[10px] text-slate-400 font-mono tracking-wider font-bold uppercase">Biểu đồ Trực quan</span>
+            <h4 className="text-xs font-bold text-slate-800 uppercase tracking-tight flex items-center gap-1.5">
               📈 Điểm số thi đua thực tế của từng đơn vị theo điều kiện lọc
             </h4>
           </div>
           <div className="text-[10px] text-slate-400 font-mono text-right italic">
-            Hiển thị điểm thi đua (0 - 100) của các Chi cục có dữ liệu chỉ tiêu
+            Hiển thị điểm thi đua (0 - 100) của các đơn vị có dữ liệu chỉ tiêu
           </div>
         </div>
 
@@ -576,11 +576,11 @@ export default function EmulationScores({ submissions, units, departments }: Emu
       <div className="bg-white rounded-2xl border border-slate-200 shadow-md overflow-hidden">
         <div className="px-5 py-4 bg-slate-100/70 border-b border-indigo-100/60 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <div>
-            <h4 className="text-sm font-black text-slate-900 uppercase tracking-wide">
+            <h4 className="text-sm font-bold text-slate-800 uppercase tracking-wide">
               Bảng kê khai tính điểm thi đua chi tiết
             </h4>
-            <p className="text-xs text-slate-700 font-sans mt-1">
-              Danh mục các chi cục được xếp hạng động. Nhấp vào dòng để xem danh sách báo cáo chi tiết được lập chỉ số tính điểm.
+            <p className="text-xs text-slate-600 font-sans mt-1">
+              Danh mục các đơn vị được xếp hạng động. Nhấp vào dòng để xem danh sách báo cáo chi tiết được lập chỉ số tính điểm.
             </p>
           </div>
           <span className="text-xs px-3 py-1.5 bg-sky-100 text-sky-900 font-bold rounded-lg font-mono border border-sky-200">
@@ -589,44 +589,44 @@ export default function EmulationScores({ submissions, units, departments }: Emu
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse table-auto text-xs sm:text-sm">
+          <table className="w-full text-left border border-slate-300 table-auto text-xs">
             <thead>
-              <tr className="bg-slate-50 border-b border-slate-200 text-slate-800">
-                <th className="py-4 px-4 font-bold text-slate-800 text-xs sm:text-[13px] uppercase text-center w-16">
-                  <button onClick={() => handleSort('Rank')} className="flex items-center space-x-1 mx-auto hover:text-slate-950 font-extrabold">
-                    <span>Hạng</span> <ArrowUpDown className="w-3.5 h-3.5" />
+              <tr className="bg-slate-100 text-slate-700 border-b border-slate-300 font-sans font-semibold">
+                <th className="py-3 px-3 font-semibold text-slate-700 border border-slate-300 text-xs text-center w-16 bg-slate-100">
+                  <button onClick={() => handleSort('Rank')} className="flex items-center space-x-1 mx-auto hover:text-indigo-950 font-semibold cursor-pointer">
+                    <span>Hạng</span> <ArrowUpDown className="w-3 h-3" />
                   </button>
                 </th>
-                <th className="py-4 px-4 font-bold text-slate-800 text-xs sm:text-[13px] uppercase">
-                  <button onClick={() => handleSort('Ten_Don_Vi')} className="flex items-center space-x-1 hover:text-slate-950 font-extrabold border-b border-dashed border-slate-300">
-                    <span>Chi Cục / Đơn vị</span> <ArrowUpDown className="w-3.5 h-3.5" />
+                <th className="py-3 px-4 font-semibold text-slate-700 border border-slate-300 text-xs bg-slate-100 text-left">
+                  <button onClick={() => handleSort('Ten_Don_Vi')} className="flex items-center space-x-1 hover:text-indigo-950 font-semibold border-b border-dashed border-slate-400 cursor-pointer">
+                    <span>Đơn vị Thống kê</span> <ArrowUpDown className="w-3 h-3" />
                   </button>
                 </th>
-                <th className="py-4 px-3 font-bold text-slate-800 text-xs sm:text-[13px] uppercase text-center font-extrabold">Địa bàn</th>
-                <th className="py-4 px-3 font-bold text-slate-800 text-xs sm:text-[13px] uppercase text-center">
-                  <button onClick={() => handleSort('Tong_Bao_Cao')} className="flex items-center space-x-1 mx-auto hover:text-slate-950 font-extrabold">
-                    <span>Giao việc</span> <ArrowUpDown className="w-3.5 h-3.5" />
+                <th className="py-3 px-3 font-semibold text-slate-700 border border-slate-300 text-xs text-center bg-slate-100">Địa bàn</th>
+                <th className="py-3 px-3 font-semibold text-slate-700 border border-slate-300 text-xs text-center bg-slate-100">
+                  <button onClick={() => handleSort('Tong_Bao_Cao')} className="flex items-center space-x-1 mx-auto hover:text-indigo-950 font-semibold cursor-pointer">
+                    <span>Giao việc</span> <ArrowUpDown className="w-3 h-3" />
                   </button>
                 </th>
-                <th className="py-4 px-3 font-bold text-slate-800 text-xs sm:text-[13px] uppercase text-center">
-                  <button onClick={() => handleSort('Da_Nop')} className="flex items-center space-x-1 mx-auto hover:text-slate-950 font-extrabold">
-                    <span>Đã nộp</span> <ArrowUpDown className="w-3.5 h-3.5" />
+                <th className="py-3 px-3 font-semibold text-slate-700 border border-slate-300 text-xs text-center bg-slate-100">
+                  <button onClick={() => handleSort('Da_Nop')} className="flex items-center space-x-1 mx-auto hover:text-indigo-950 font-semibold cursor-pointer">
+                    <span>Đã nộp</span> <ArrowUpDown className="w-3 h-3" />
                   </button>
                 </th>
-                <th className="py-4 px-3 font-extrabold text-emerald-800 text-xs sm:text-[13px] uppercase text-center">
-                  <button onClick={() => handleSort('Nop_Dung_Han')} className="flex items-center space-x-1 mx-auto hover:text-emerald-950">
-                    <span>Đúng hạn</span> <ArrowUpDown className="w-3.5 h-3.5" />
+                <th className="py-3 px-3 font-semibold text-emerald-900 border border-slate-300 text-xs text-center bg-emerald-50/70">
+                  <button onClick={() => handleSort('Nop_Dung_Han')} className="flex items-center space-x-1 mx-auto hover:text-emerald-950 font-semibold cursor-pointer">
+                    <span>Đúng hạn</span> <ArrowUpDown className="w-3 h-3" />
                   </button>
                 </th>
-                <th className="py-4 px-3 font-extrabold text-amber-800 text-xs sm:text-[13px] uppercase text-center">Trễ hạn</th>
-                <th className="py-4 px-3 font-extrabold text-rose-800 text-xs sm:text-[13px] uppercase text-center">Chưa nộp</th>
-                <th className="py-4 px-3 font-bold text-slate-800 text-xs sm:text-[13px] uppercase text-center">Trễ tổng</th>
-                <th className="py-4 px-4 font-extrabold text-indigo-900 text-xs sm:text-[13px] uppercase text-center bg-indigo-50/50 w-32">
-                  <button onClick={() => handleSort('Diem_Thi_Dua')} className="flex items-center space-x-2 mx-auto hover:text-indigo-950">
-                    <span>Điểm Thi Đua</span> <ArrowUpDown className="w-3.5 h-3.5" />
+                <th className="py-3 px-3 font-semibold text-amber-900 border border-slate-300 text-xs text-center bg-amber-50/70">Trễ hạn</th>
+                <th className="py-3 px-3 font-semibold text-rose-900 border border-slate-300 text-xs text-center bg-rose-50/70">Chưa nộp</th>
+                <th className="py-3 px-3 font-semibold text-slate-700 border border-slate-300 text-xs text-center bg-slate-100">Trễ tổng</th>
+                <th className="py-3 px-4 font-semibold text-indigo-950 border border-slate-300 text-xs text-center bg-indigo-50 w-32">
+                  <button onClick={() => handleSort('Diem_Thi_Dua')} className="flex items-center space-x-2 mx-auto hover:text-indigo-950 font-semibold cursor-pointer">
+                    <span>Điểm thi đua</span> <ArrowUpDown className="w-3 h-3" />
                   </button>
                 </th>
-                <th className="py-4 px-4 font-bold text-slate-800 text-xs sm:text-[13px] uppercase text-center w-24">Chi tiết</th>
+                <th className="py-3 px-4 font-semibold text-slate-700 border border-slate-300 text-xs text-center w-24 bg-slate-100">Chi tiết</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200">
@@ -666,60 +666,60 @@ export default function EmulationScores({ submissions, units, departments }: Emu
                         onClick={() => setExpandedUnitCode(isExpanded ? null : row.Ma_DV)}
                       >
                         {/* RANKING COL */}
-                        <td className="py-4 px-4 text-center">
+                        <td className="py-4 px-4 text-center border border-slate-300">
                           {row.Rank === 999 ? (
-                            <span className="text-slate-600 font-semibold italic text-xs">N/A</span>
+                            <span className="text-slate-500 italic text-xs">N/A</span>
                           ) : row.Rank <= 3 ? (
-                            <span className={`inline-flex items-center justify-center w-7 h-7 rounded-full font-black text-sm ${
-                              row.Rank === 1 ? 'bg-amber-100 text-amber-800 border border-amber-300 shadow-xs' :
-                              row.Rank === 2 ? 'bg-slate-100 text-slate-800 border border-slate-300 shadow-xs' :
+                            <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full font-bold text-xs ${
+                              row.Rank === 1 ? 'bg-amber-100 text-amber-800 border border-amber-300 shadow-2xs' :
+                              row.Rank === 2 ? 'bg-slate-100 text-slate-800 border border-slate-300 shadow-2xs' :
                               'bg-amber-50 text-amber-700 border border-amber-200'
                             }`}>
                               {row.Rank}
                             </span>
                           ) : (
-                            <span className="font-mono text-xs sm:text-sm font-black text-slate-700">{row.Rank}</span>
+                            <span className="font-mono text-xs sm:text-sm font-semibold text-slate-600">{row.Rank}</span>
                           )}
                         </td>
 
                         {/* UNIT NAME & DETAILS */}
-                        <td className="py-4 px-4">
+                        <td className="py-4 px-4 border border-slate-300">
                           <div className="flex flex-col">
-                            <span className="font-extrabold text-slate-900 text-xs sm:text-[14px] leading-tight">{row.Ten_Don_Vi}</span>
-                            <span className="text-[11px] text-slate-600 font-mono font-bold mt-1 tracking-tight bg-slate-100 px-2.5 py-0.5 rounded-md w-max">Mã: {row.Ma_DV}</span>
+                            <span className="font-bold text-slate-850 text-xs sm:text-[13px] leading-tight">{row.Ten_Don_Vi}</span>
+                            <span className="text-[10px] text-slate-500 font-mono font-medium mt-1 tracking-tight bg-slate-50 px-2.5 py-0.5 rounded-md border border-slate-200/60 w-max">Mã: {row.Ma_DV}</span>
                           </div>
                         </td>
 
                         {/* REGION AREA */}
-                        <td className="py-4 px-3 text-center">
-                          <span className={`px-3 py-1 rounded-full text-xs font-bold border ${
+                        <td className="py-4 px-3 text-center border border-slate-300">
+                          <span className={`px-2.5 py-0.5 rounded-full text-[10.5px] font-semibold border ${
                             row.Vung === 'Khu vực 1' 
-                              ? 'bg-sky-100 text-sky-800 border-sky-200' 
-                              : 'bg-emerald-100 text-emerald-800 border-emerald-200'
+                              ? 'bg-sky-50 text-sky-800 border-sky-150' 
+                              : 'bg-emerald-50 text-emerald-800 border-emerald-150'
                           }`}>
                             {row.Vung}
                           </span>
                         </td>
 
                         {/* COUNTS GIAO VIEC */}
-                        <td className="py-4 px-3 text-center font-mono font-bold text-slate-800 text-xs sm:text-sm">{row.Tong_Bao_Cao}</td>
-                        <td className="py-4 px-3 text-center font-mono font-bold text-slate-800 text-xs sm:text-sm">{row.Da_Nop}</td>
-                        <td className="py-4 px-3 text-center font-mono font-black text-emerald-700 text-xs sm:text-sm">{row.Nop_Dung_Han}</td>
-                        <td className="py-4 px-3 text-center font-mono font-black text-amber-700 text-xs sm:text-sm">{row.Nop_Tre_Han}</td>
-                        <td className="py-4 px-3 text-center font-mono font-black text-rose-700 text-xs sm:text-sm">
+                        <td className="py-4 px-3 text-center font-mono font-semibold text-slate-700 text-xs sm:text-sm border border-slate-300">{row.Tong_Bao_Cao}</td>
+                        <td className="py-4 px-3 text-center font-mono font-semibold text-slate-700 text-xs sm:text-sm border border-slate-300">{row.Da_Nop}</td>
+                        <td className="py-4 px-3 text-center font-mono font-bold text-emerald-700 text-xs sm:text-sm border border-slate-300">{row.Nop_Dung_Han}</td>
+                        <td className="py-4 px-3 text-center font-mono font-bold text-amber-700 text-xs sm:text-sm border border-slate-300">{row.Nop_Tre_Han}</td>
+                        <td className="py-4 px-3 text-center font-mono font-bold text-rose-700 text-xs sm:text-sm border border-slate-300">
                           {row.Chua_Nop > 0 ? (
-                            <span className="px-2 py-0.5 bg-rose-100 text-rose-800 border border-rose-200 rounded text-xs animate-pulse font-extrabold">{row.Chua_Nop}</span>
+                            <span className="px-2 py-0.5 bg-rose-100 text-rose-800 border border-rose-200 rounded text-xs animate-pulse font-bold">{row.Chua_Nop}</span>
                           ) : '0'}
                         </td>
-                        <td className="py-4 px-3 text-center font-mono font-bold text-slate-700 text-xs sm:text-sm">{row.So_Ngay_Tre_Tong}d</td>
+                        <td className="py-4 px-3 text-center font-mono font-semibold text-slate-600 text-xs sm:text-sm border border-slate-300">{row.So_Ngay_Tre_Tong}d</td>
 
                         {/* EMULATION SCORE POINT INDEX SCORE */}
-                        <td className="py-4 px-4 text-center bg-slate-50/50">
+                        <td className="py-4 px-4 text-center bg-slate-50/50 border border-slate-300">
                           {!row.Has_Data ? (
                             <span className="text-slate-500 italic text-[11px] font-semibold">N/A (Chưa nộp)</span>
                           ) : (
                             <div className="flex flex-col items-center">
-                              <span className="font-sans text-xs sm:text-sm font-black text-slate-900 bg-indigo-50 border border-indigo-150 px-3 py-1.5 rounded-lg shadow-2xs">
+                              <span className="font-sans text-xs sm:text-sm font-bold text-indigo-900 bg-indigo-50/70 border border-indigo-150 px-3 py-1 rounded-lg">
                                 {row.Diem_Thi_Dua}
                               </span>
                               {/* progress micro line */}
@@ -738,7 +738,7 @@ export default function EmulationScores({ submissions, units, departments }: Emu
                         </td>
 
                         {/* DRILLDOWN BUTTON TRIGGER */}
-                        <td className="py-4 px-4 text-center" onClick={(e) => e.stopPropagation()}>
+                        <td className="py-4 px-4 text-center border border-slate-300" onClick={(e) => e.stopPropagation()}>
                           <button
                             onClick={() => setExpandedUnitCode(isExpanded ? null : row.Ma_DV)}
                             className="p-1 px-3 bg-slate-200 hover:bg-sky-150 text-slate-800 hover:text-sky-900 text-xs font-black rounded-lg flex items-center space-x-1.5 mx-auto transition-all cursor-pointer border border-slate-300"

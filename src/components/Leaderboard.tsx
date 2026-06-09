@@ -143,53 +143,53 @@ export default function Leaderboard({
               <tr className="bg-slate-50/70 border-b border-slate-100">
                 
                 {/* Headers column with sort clicks */}
-                <th className="py-4 px-5 text-[10px] font-mono text-slate-400 font-bold uppercase tracking-wider text-center w-16">
-                  <button onClick={() => handleSort('Rank')} className="flex items-center space-x-1 mx-auto hover:text-slate-700">
+                <th className="py-3 px-5 text-xs font-sans text-slate-500 font-semibold text-center w-16">
+                  <button onClick={() => handleSort('Rank')} className="flex items-center space-x-1 mx-auto hover:text-slate-700 cursor-pointer font-semibold">
                     <span>Hạng</span> <ArrowUpDown className="w-3 h-3" />
                   </button>
                 </th>
 
-                <th className="py-4 px-5 text-[10px] font-mono text-slate-400 font-bold uppercase tracking-wider min-w-[200px]">
-                  <button onClick={() => handleSort('Ten_Don_Vi')} className="flex items-center space-x-1 hover:text-slate-700">
+                <th className="py-3 px-5 text-xs font-sans text-slate-500 font-semibold min-w-[200px] text-left">
+                  <button onClick={() => handleSort('Ten_Don_Vi')} className="flex items-center space-x-1 hover:text-slate-700 cursor-pointer font-semibold">
                     <span>Đơn vị Thống kê</span> <ArrowUpDown className="w-3 h-3" />
                   </button>
                 </th>
 
-                <th className="py-4 px-4 text-[10px] font-mono text-slate-400 font-bold uppercase tracking-wider text-center">
-                  <button onClick={() => handleSort('Vung')} className="flex items-center space-x-1 mx-auto hover:text-slate-700">
+                <th className="py-3 px-4 text-xs font-sans text-slate-500 font-semibold text-center">
+                  <button onClick={() => handleSort('Vung')} className="flex items-center space-x-1 mx-auto hover:text-slate-700 cursor-pointer font-semibold">
                     <span>Vùng</span> <ArrowUpDown className="w-3 h-3" />
                   </button>
                 </th>
 
-                <th className="py-4 px-3 text-[10px] font-mono text-slate-400 font-bold uppercase tracking-wider text-center">
+                <th className="py-3 px-3 text-xs font-sans text-slate-500 font-semibold text-center">
                   <span className="cursor-help" title="Tổng số báo cáo được giao">Giao chỉ tiêu</span>
                 </th>
 
-                <th className="py-4 px-3 text-[10px] font-mono text-slate-400 font-bold uppercase tracking-wider text-center">
+                <th className="py-3 px-3 text-xs font-sans text-slate-500 font-semibold text-center">
                   <span className="text-emerald-700 font-semibold cursor-help" title="Số lượng báo cáo nộp đúng hoặc trước hạn">Đúng hạn</span>
                 </th>
 
-                <th className="py-4 px-3 text-[10px] font-mono text-slate-400 font-bold uppercase tracking-wider text-center">
+                <th className="py-3 px-3 text-xs font-sans text-slate-500 font-semibold text-center">
                   <span className="text-amber-700 font-semibold cursor-help" title="Số lượng báo cáo nộp trễ hạn">Trễ hạn</span>
                 </th>
 
-                <th className="py-4 px-3 text-[10px] font-mono text-slate-400 font-bold uppercase tracking-wider text-center">
+                <th className="py-3 px-3 text-xs font-sans text-slate-500 font-semibold text-center">
                   <span className="text-rose-700 font-semibold cursor-help" title="Số lượng báo cáo quá hạn định nhưng vẫn chưa nộp">Quá hạn</span>
                 </th>
 
-                <th className="py-4 px-3 text-[10px] font-mono text-slate-400 font-bold uppercase tracking-wider text-center">
-                  <button onClick={() => handleSort('So_Ngay_Tre_Tong')} className="flex items-center space-x-1 mx-auto hover:text-slate-700">
+                <th className="py-3 px-3 text-xs font-sans text-slate-500 font-semibold text-center">
+                  <button onClick={() => handleSort('So_Ngay_Tre_Tong')} className="flex items-center space-x-1 mx-auto hover:text-slate-700 cursor-pointer font-semibold">
                     <span>Tổng ngày trễ</span> <ArrowUpDown className="w-3 h-3" />
                   </button>
                 </th>
 
-                <th className="py-4 px-3 text-[10px] font-mono text-slate-400 font-bold uppercase tracking-wider text-center">
-                  <button onClick={() => handleSort('Diem_Thi_Dua')} className="flex items-center space-x-1 mx-auto hover:text-slate-700">
+                <th className="py-3 px-3 text-xs font-sans text-slate-500 font-semibold text-center">
+                  <button onClick={() => handleSort('Diem_Thi_Dua')} className="flex items-center space-x-1 mx-auto hover:text-slate-700 cursor-pointer font-semibold">
                     <span>Điểm thi đua TB</span> <ArrowUpDown className="w-3 h-3" />
                   </button>
                 </th>
 
-                <th className="py-4 px-5 text-[10px] font-mono text-slate-400 font-bold uppercase tracking-wider text-center w-20">
+                <th className="py-3 px-5 text-xs font-sans text-slate-500 font-semibold text-center w-20">
                   Thao tác
                 </th>
                 

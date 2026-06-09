@@ -5,14 +5,18 @@ import {
   Briefcase, 
   Layers, 
   Search, 
-  TrendingUp, 
   CheckCircle2, 
   AlertTriangle, 
   Star, 
   FileSpreadsheet, 
   Activity, 
-  PlusCircle, 
-  Download 
+  Download,
+  Calendar,
+  Layers3,
+  TrendingUp,
+  FileText,
+  Clock,
+  UserCheck
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
@@ -22,23 +26,46 @@ interface SummaryMenuProps {
   units: { Ma_DV: string; Ten_Don_Vi: string; Vung: string }[];
 }
 
-type SummarySubTab = 'by-unit' | 'by-dept' | 'by-type';
+type SummarySubTab = 'by-unit' | 'by-dept-rank' | 'by-type-rank' | 'report-tracking';
 
 export default function SummaryMenu({ submissions, departments, units }: SummaryMenuProps) {
   const [subTab, setSubTab] = useState<SummarySubTab>('by-unit');
   const [searchTerm, setSearchTerm] = useState('');
   const [regionFilter, setRegionFilter] = useState<'ALL' | 'VUNG1' | 'VUNG2'>('ALL');
 
-  // --- 1. DATA COMPUTATION FOR GROUPS ---
+  // Tab 2 Filter: Selected Department
+  const [selectedDept, setSelectedDept] = useState<string>('P_TH');
+  
+  // Tab 3 Filter: Selected Report Category
+  const [selectedReportType, setSelectedReportType] = useState<string>('Báo cáo tháng');
 
-  // GROUPS A: BY UNIT (14 units)
+  // Tab 4 Filter: Report Tracking Status
+  const [trackingFilter, setTrackingFilter] = useState<string>('ALL');
+
+  // Helper classifier for report types/categories
+  const getReportCategory = (s: ReportSubmission): 'Báo cáo nhanh' | 'Báo cáo phân tích' | 'Báo cáo tháng' | 'Báo cáo năm' => {
+    const name = s.Ten_Bao_Cao.toLowerCase();
+    const type = s.Loai_BC?.toLowerCase() || '';
+    if (name.includes('ước tính') || name.includes('báo cáo nhanh')) {
+      return 'Báo cáo nhanh';
+    }
+    if (name.includes('phân tính') || name.includes('phân tích') || name.includes('chuyên đề')) {
+      return 'Báo cáo phân tích';
+    }
+    if (type.includes('tháng') || name.includes('tháng')) {
+      return 'Báo cáo tháng';
+    }
+    return 'Báo cáo năm';
+  };
+
+  // --- 1. DATA COMPUTATION FOR TAB 1: TỔNG HỢP THEO ĐƠN VỊ ---
   const unitSummaries = units.map(u => {
     const uSubs = submissions.filter(s => s.Ma_DV === u.Ma_DV);
     const total = uSubs.length;
     const completed = uSubs.filter(s => s.Ngay_Nop !== null).length;
     const onTime = uSubs.filter(s => s.Ngay_Nop !== null && (s.So_Ngay_Tre ?? 0) <= 0).length;
     const late = uSubs.filter(s => s.Ngay_Nop !== null && (s.So_Ngay_Tre ?? 0) > 0).length;
-    const overdue = uSubs.filter(s => s.Ngay_Nop === null).length; // pending
+    const overdue = uSubs.filter(s => s.Ngay_Nop === null).length;
 
     const totalDinhMuc = uSubs.reduce((sum, s) => sum + s.Diem_Dinh_Muc, 0);
     const totalDiemThoiGian = uSubs.reduce((sum, s) => sum + (s.Diem_Thoi_Gian ?? 0), 0);
@@ -46,9 +73,7 @@ export default function SummaryMenu({ submissions, departments, units }: Summary
     const totalTongDiem = uSubs.reduce((sum, s) => sum + (s.Tong_Diem ?? 0), 0);
 
     const completionRate = total > 0 ? (completed / total) * 100 : 0;
-    const onTimeRate = completed > 0 ? (onTime / completed) * 100 : 0;
     const emulationIndex = totalDinhMuc > 0 ? (totalTongDiem / totalDinhMuc) * 100 : 0;
-    const totalDaysLate = uSubs.reduce((sum, s) => sum + (s.So_Ngay_Tre ?? 0), 0);
 
     return {
       Ma_DV: u.Ma_DV,
@@ -64,84 +89,10 @@ export default function SummaryMenu({ submissions, departments, units }: Summary
       Diem_Chat_Luong: Math.round(totalDiemChatLuong * 10) / 10,
       Tong_Diem: Math.round(totalTongDiem * 10) / 10,
       Ti_Le_HT: Math.round(completionRate * 10) / 10,
-      Diem_Thi_Dua_Phan_Tram: Math.round(emulationIndex * 10) / 10,
-      Tong_Ngay_Tre: totalDaysLate
+      Diem_Thi_Dua_Phan_Tram: Math.round(emulationIndex * 10) / 10
     };
   });
 
-  // GROUPS B: BY RESPONSIBLE DEPARTMENT
-  const deptSummaries = departments.map(d => {
-    const dSubs = submissions.filter(s => s.Ma_Phong === d.Ma_Phong);
-    const total = dSubs.length;
-    const completed = dSubs.filter(s => s.Ngay_Nop !== null).length;
-    const onTime = dSubs.filter(s => s.Ngay_Nop !== null && (s.So_Ngay_Tre ?? 0) <= 0).length;
-    const late = dSubs.filter(s => s.Ngay_Nop !== null && (s.So_Ngay_Tre ?? 0) > 0).length;
-    const overdue = dSubs.filter(s => s.Ngay_Nop === null).length;
-
-    const totalDinhMuc = dSubs.reduce((sum, s) => sum + s.Diem_Dinh_Muc, 0);
-    const totalDiemThoiGian = dSubs.reduce((sum, s) => sum + (s.Diem_Thoi_Gian ?? 0), 0);
-    const totalDiemChatLuong = dSubs.reduce((sum, s) => sum + (s.Diem_Chat_Luong ?? 0), 0);
-    const totalTongDiem = dSubs.reduce((sum, s) => sum + (s.Tong_Diem ?? 0), 0);
-
-    const completionRate = total > 0 ? (completed / total) * 100 : 0;
-    const avgDaysLate = completed > 0 ? (dSubs.reduce((sum, s) => sum + (s.So_Ngay_Tre ?? 0), 0) / completed) : 0;
-    const emulationIndex = totalDinhMuc > 0 ? (totalTongDiem / totalDinhMuc) * 100 : 0;
-
-    return {
-      Ma_Phong: d.Ma_Phong,
-      Ten_Phong: d.Ten_Phong,
-      Tong_Bao_Cao: total,
-      Da_Nop: completed,
-      Dung_Han: onTime,
-      Trere_Han: late,
-      Chua_Nop: overdue,
-      Diem_Dinh_Muc: totalDinhMuc,
-      Diem_TG: Math.round(totalDiemThoiGian * 10) / 10,
-      Diem_Chat_Luong: Math.round(totalDiemChatLuong * 10) / 10,
-      Tong_Diem: Math.round(totalTongDiem * 10) / 10,
-      Ti_Le_HT: Math.round(completionRate * 10) / 10,
-      Diem_Thi_Dua_Phan_Tram: Math.round(emulationIndex * 10) / 10,
-      TB_Ngay_Tre: Math.round(avgDaysLate * 10) / 10
-    };
-  });
-
-  // GROUPS C: BY REPORT TYPE
-  const reportTypes = Array.from(new Set(submissions.map(s => s.Loai_BC || 'Tháng')));
-  const typeSummaries = reportTypes.map(type => {
-    const tSubs = submissions.filter(s => s.Loai_BC === type);
-    const total = tSubs.length;
-    const completed = tSubs.filter(s => s.Ngay_Nop !== null).length;
-    const onTime = tSubs.filter(s => s.Ngay_Nop !== null && (s.So_Ngay_Tre ?? 0) <= 0).length;
-    const late = tSubs.filter(s => s.Ngay_Nop !== null && (s.So_Ngay_Tre ?? 0) > 0).length;
-    const overdue = tSubs.filter(s => s.Ngay_Nop === null).length;
-
-    const totalDinhMuc = tSubs.reduce((sum, s) => sum + s.Diem_Dinh_Muc, 0);
-    const totalDiemThoiGian = tSubs.reduce((sum, s) => sum + (s.Diem_Thoi_Gian ?? 0), 0);
-    const totalDiemChatLuong = tSubs.reduce((sum, s) => sum + (s.Diem_Chat_Luong ?? 0), 0);
-    const totalTongDiem = tSubs.reduce((sum, s) => sum + (s.Tong_Diem ?? 0), 0);
-
-    const completionRate = total > 0 ? (completed / total) * 100 : 0;
-    const emulationIndex = totalDinhMuc > 0 ? (totalTongDiem / totalDinhMuc) * 100 : 0;
-    const avgDaysLate = completed > 0 ? (tSubs.reduce((sum, s) => sum + (s.So_Ngay_Tre ?? 0), 0) / completed) : 0;
-
-    return {
-      Loai_BC: type,
-      Tong_Bao_Cao: total,
-      Da_Nop: completed,
-      Dung_Han: onTime,
-      Trere_Han: late,
-      Chua_Nop: overdue,
-      Diem_Dinh_Muc: totalDinhMuc,
-      Diem_TG: Math.round(totalDiemThoiGian * 10) / 10,
-      Diem_Chat_Luong: Math.round(totalDiemChatLuong * 10) / 10,
-      Tong_Diem: Math.round(totalTongDiem * 10) / 10,
-      Ti_Le_HT: Math.round(completionRate * 10) / 10,
-      Diem_Thi_Dua_Phan_Tram: Math.round(emulationIndex * 10) / 10,
-      TB_Ngay_Tre: Math.round(avgDaysLate * 10) / 10
-    };
-  });
-
-  // --- SEARCH AND FILTER RUNS ---
   const filteredUnitSummaries = unitSummaries.filter(u => {
     const matchesSearch = u.Ten_Don_Vi.toLowerCase().includes(searchTerm.toLowerCase()) || 
                           u.Ma_DV.toLowerCase().includes(searchTerm.toLowerCase());
@@ -152,298 +103,463 @@ export default function SummaryMenu({ submissions, departments, units }: Summary
     return matchesSearch;
   });
 
-  const filteredDeptSummaries = deptSummaries.filter(d => 
-    d.Ten_Phong.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    d.Ma_Phong.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // --- 2. DATA COMPUTATION FOR TAB 2: XẾP HẠNG THEO PHÒNG BAN ---
+  const unitsDeptSummaries = units.map(u => {
+    const uSubs = submissions.filter(s => s.Ma_DV === u.Ma_DV && s.Ma_Phong === selectedDept);
+    const total = uSubs.length;
+    const completed = uSubs.filter(s => s.Ngay_Nop !== null).length;
+    const totalDinhMuc = uSubs.reduce((sum, s) => sum + s.Diem_Dinh_Muc, 0);
+    const totalDiemThoiGian = uSubs.reduce((sum, s) => sum + (s.Diem_Thoi_Gian ?? 0), 0);
+    const totalDiemChatLuong = uSubs.reduce((sum, s) => sum + (s.Diem_Chat_Luong ?? 0), 0);
+    const totalTongDiem = uSubs.reduce((sum, s) => sum + (s.Tong_Diem ?? 0), 0);
 
-  const filteredTypeSummaries = typeSummaries.filter(t => 
-    t.Loai_BC.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+    const emulationIndex = totalDinhMuc > 0 ? (totalTongDiem / totalDinhMuc) * 100 : 0;
 
+    return {
+      Ma_DV: u.Ma_DV,
+      Ten_Don_Vi: u.Ten_Don_Vi,
+      Vung: u.Vung,
+      Tong_Bao_Cao: total,
+      Da_Nop: completed,
+      Diem_Dinh_Muc: totalDinhMuc,
+      Diem_TG: Math.round(totalDiemThoiGian * 10) / 10,
+      Diem_Chat_Luong: Math.round(totalDiemChatLuong * 10) / 10,
+      Tong_Diem: Math.round(totalTongDiem * 10) / 10,
+      Diem_Thi_Dua_Phan_Tram: Math.round(emulationIndex * 10) / 10
+    };
+  });
 
-  // --- EXCEL SPECIFIC SUB-EXPORTS ---
-  const handleExportSelectedSummaryTable = () => {
+  // Sort units by Total Score descending to display as Rank (1 to 14)
+  const rankedUnitsDept = [...unitsDeptSummaries]
+    .sort((a, b) => b.Tong_Diem - a.Tong_Diem || b.Diem_Thi_Dua_Phan_Tram - a.Diem_Thi_Dua_Phan_Tram)
+    .filter(u => u.Ten_Don_Vi.toLowerCase().includes(searchTerm.toLowerCase()));
+
+  // --- 3. DATA COMPUTATION FOR TAB 3: XẾP HẠNG THEO LOẠI BÁO CÁO ---
+  const unitsTypeSummaries = units.map(u => {
+    const uSubs = submissions.filter(s => s.Ma_DV === u.Ma_DV && getReportCategory(s) === selectedReportType);
+    const total = uSubs.length;
+    const completed = uSubs.filter(s => s.Ngay_Nop !== null).length;
+    const totalDinhMuc = uSubs.reduce((sum, s) => sum + s.Diem_Dinh_Muc, 0);
+    const totalDiemThoiGian = uSubs.reduce((sum, s) => sum + (s.Diem_Thoi_Gian ?? 0), 0);
+    const totalDiemChatLuong = uSubs.reduce((sum, s) => sum + (s.Diem_Chat_Luong ?? 0), 0);
+    const totalTongDiem = uSubs.reduce((sum, s) => sum + (s.Tong_Diem ?? 0), 0);
+
+    const emulationIndex = totalDinhMuc > 0 ? (totalTongDiem / totalDinhMuc) * 100 : 0;
+
+    return {
+      Ma_DV: u.Ma_DV,
+      Ten_Don_Vi: u.Ten_Don_Vi,
+      Vung: u.Vung,
+      Tong_Bao_Cao: total,
+      Da_Nop: completed,
+      Diem_Dinh_Muc: totalDinhMuc,
+      Diem_TG: Math.round(totalDiemThoiGian * 10) / 10,
+      Diem_Chat_Luong: Math.round(totalDiemChatLuong * 10) / 10,
+      Tong_Diem: Math.round(totalTongDiem * 10) / 10,
+      Diem_Thi_Dua_Phan_Tram: Math.round(emulationIndex * 10) / 10
+    };
+  });
+
+  // Sort units dynamically to rank them (1 to 14)
+  const rankedUnitsType = [...unitsTypeSummaries]
+    .sort((a, b) => b.Tong_Diem - a.Tong_Diem || b.Diem_Thi_Dua_Phan_Tram - a.Diem_Thi_Dua_Phan_Tram)
+    .filter(u => u.Ten_Don_Vi.toLowerCase().includes(searchTerm.toLowerCase()));
+
+  // --- 4. DATA COMPUTATION FOR TAB 4: THEO DÕI BÁO CÁO ---
+  const filteredTrackingReports = submissions.filter(s => {
+    const matchesSearch = s.Ten_Bao_Cao.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                          s.Ten_Don_Vi.toLowerCase().includes(searchTerm.toLowerCase());
+    if (!matchesSearch) return false;
+
+    switch (trackingFilter) {
+      case 'DUE_NOT_SUBMITTED': // Báo cáo đến hạn chưa gửi
+        return s.Ngay_Nop === null;
+      case 'ON_TIME': // Báo cáo đúng hạn
+        return s.Ngay_Nop !== null && (s.So_Ngay_Tre ?? 0) <= 0;
+      case 'LATE': // Báo cáo trễ hạn
+        return s.Ngay_Nop !== null && (s.So_Ngay_Tre ?? 0) > 0;
+      case 'UNGRADED': // Báo cáo chưa chấm
+        return s.Ngay_Nop !== null && s.Diem_Chat_Luong === null;
+      case 'GRADED': // Báo cáo đã chấm
+        return s.Ngay_Nop !== null && s.Diem_Chat_Luong !== null;
+      case 'NOT_SUBMITTED': // Báo cáo chưa gửi
+        return s.Ngay_Nop === null;
+      case 'SUBMITTED': // Báo cáo đã gửi
+        return s.Ngay_Nop !== null;
+      default:
+        return true;
+    }
+  });
+
+  // Export functions to Excel
+  const handleExportToExcel = () => {
     try {
       const wb = XLSX.utils.book_new();
 
       if (subTab === 'by-unit') {
         const sheetData = filteredUnitSummaries.map((u, i) => ({
           'STT': i + 1,
-          'Mã Đơn Vị (Ma_DV)': u.Ma_DV,
+          'Mã Đơn Vị': u.Ma_DV,
           'Tên Đơn Vị': u.Ten_Don_Vi,
           'Vùng Địa Bàn': u.Vung,
-          'Tổng Số Chỉ Tiêu Giao': u.Tong_Bao_Cao,
-          'Số Lượng Đã Nộp': u.Da_Nop,
-          'Nộp Đúng Hạn': u.Dung_Han,
-          'Nộp Trễ Hạn': u.Trere_Han,
-          'Số Báo Cáo Thiếu (Trễ nộp)': u.Chua_Nop,
-          'Tổng Điểm Định Mực GP': u.Diem_Dinh_Muc,
-          'Tổng Điểm Thời Gian (Diem_TG)': u.Diem_TG,
-          'Tổng Điểm Chất Lượng NV': u.Diem_Chat_Luong,
-          'Tổng Điểm Thực Đạt (Tong_Diem)': u.Tong_Diem,
-          'Tỷ Lệ Hoàn Thành (%)': `${u.Ti_Le_HT}%`,
-          'Chỉ Số Thi Đua Đạt (%)': `${u.Diem_Thi_Dua_Phan_Tram}%`,
-          'Tổng Số Ngày Trễ': u.Tong_Ngay_Tre
+          'Tổng Số Chỉ Tiêu': u.Tong_Bao_Cao,
+          'Đã Nộp': u.Da_Nop,
+          'Tổng Điểm Định Mức': u.Diem_Dinh_Muc,
+          'Tổng Điểm Thời Gian': u.Diem_TG,
+          'Tổng Điểm Chất Lượng': u.Diem_Chat_Luong,
+          'Tổng Điểm Thực Đạt': u.Tong_Diem,
+          'Chỉ Số Thi Đua (%)': `${u.Diem_Thi_Dua_Phan_Tram}%`
         }));
         const ws = XLSX.utils.json_to_sheet(sheetData);
-        XLSX.utils.book_append_sheet(wb, ws, 'Tổng Hợp Theo Đơn Vị');
-        XLSX.writeFile(wb, `Tong_hop_Theo_Don_Vi_${new Date().getFullYear()}.xlsx`);
+        XLSX.utils.book_append_sheet(wb, ws, 'Điểm Theo Đơn Vị');
+        XLSX.writeFile(wb, `Diem_Theo_Don_Vi_${new Date().getFullYear()}.xlsx`);
       } 
-      else if (subTab === 'by-dept') {
-        const sheetData = filteredDeptSummaries.map((d, i) => ({
-          'STT': i + 1,
-          'Mã Phòng (Ma_Phong)': d.Ma_Phong,
-          'Tên Phòng Phụ Trách': d.Ten_Phong,
-          'Tổng Số Báo Cáo Đang Giao': d.Tong_Bao_Cao,
-          'Độ Phủ Đã Nộp': d.Da_Nop,
-          'Số Lượt Đúng Giờ': d.Dung_Han,
-          'Giờ Trễ Quá Hạn': d.Chua_Nop,
-          'Tổng Điểm Định Mực': d.Diem_Dinh_Muc,
-          'Điểm Thời Gian Ghi Nhận': d.Diem_TG,
-          'Điểm Nghiệp Vụ Chuyên Môn': d.Diem_Chat_Luong,
-          'Tổng Điểm Thu Về': d.Tong_Diem,
-          'Hiệu Suất Nộp (%)': `${d.Ti_Le_HT}%`,
-          'Chỉ Số Hoạt Động (%)': `${d.Diem_Thi_Dua_Phan_Tram}%`,
-          'Bình Quân Ngày Trễ': d.TB_Ngay_Tre
+      else if (subTab === 'by-dept-rank') {
+        const currentDeptName = departments.find(d => d.Ma_Phong === selectedDept)?.Ten_Phong || 'Phòng ban';
+        const sheetData = rankedUnitsDept.map((u, i) => ({
+          'STT (Hạng)': i + 1,
+          'Mã Đơn Vị': u.Ma_DV,
+          'Tên Đơn Vị': u.Ten_Don_Vi,
+          'Tổng Báo cáo': u.Tong_Bao_Cao,
+          'Đã Nộp': u.Da_Nop,
+          'Điểm Định Mức': u.Diem_Dinh_Muc,
+          'Điểm Thời Gian đạt': u.Diem_TG,
+          'Điểm Chất Lượng đạt': u.Diem_Chat_Luong,
+          'Tổng Điểm Thực Đạt': u.Tong_Diem,
+          'Chỉ Số Thi Đua (%)': `${u.Diem_Thi_Dua_Phan_Tram}%`
         }));
         const ws = XLSX.utils.json_to_sheet(sheetData);
-        XLSX.utils.book_append_sheet(wb, ws, 'Tổng Hợp Theo Phòng Nghiệp Vụ');
-        XLSX.writeFile(wb, `Tong_hop_Theo_Phong_${new Date().getFullYear()}.xlsx`);
+        XLSX.utils.book_append_sheet(wb, ws, 'Hạng Theo Lĩnh Vực');
+        XLSX.writeFile(wb, `Xep_Hang_${selectedDept}_${new Date().getFullYear()}.xlsx`);
       } 
-      else if (subTab === 'by-type') {
-        const sheetData = filteredTypeSummaries.map((t, i) => ({
-          'STT': i + 1,
-          'Loại Báo Cáo (Loai_BC)': t.Loai_BC,
-          'Tổng Chỉ Tiêu Phân Giao': t.Tong_Bao_Cao,
-          'Tổng Số Báo Cáo Đã Nộp': t.Da_Nop,
-          'Thời Hạn Nộp Đúng': t.Dung_Han,
-          'Quá Hạn/Chưa Nộp': t.Chua_Nop,
-          'Tổng Điểm Định Mực': t.Diem_Dinh_Muc,
-          'Điểm Thời Gian đạt': t.Diem_TG,
-          'Điểm Thẩm Định chất lượng': t.Diem_Chat_Luong,
-          'Điểm Tổng Cộng thực': t.Tong_Diem,
-          'Chỉ Số Giao Nộp (%)': `${t.Ti_Le_HT}%`,
-          'Chỉ Số Thi Đua (%)': `${t.Diem_Thi_Dua_Phan_Tram}%`,
-          'Bình Quân Ngày Trễ (ngày)': t.TB_Ngay_Tre
+      else if (subTab === 'by-type-rank') {
+        const sheetData = rankedUnitsType.map((u, i) => ({
+          'STT (Hạng)': i + 1,
+          'Mã Đơn Vị': u.Ma_DV,
+          'Tên Đơn Vị': u.Ten_Don_Vi,
+          'Tổng Báo cáo': u.Tong_Bao_Cao,
+          'Đã Nộp': u.Da_Nop,
+          'Điểm Định Mức': u.Diem_Dinh_Muc,
+          'Điểm Thời Gian': u.Diem_TG,
+          'Điểm Chất Lượng': u.Diem_Chat_Luong,
+          'Tổng Điểm Thực Đạt': u.Tong_Diem,
+          'Chỉ Số Thi Đua (%)': `${u.Diem_Thi_Dua_Phan_Tram}%`
         }));
         const ws = XLSX.utils.json_to_sheet(sheetData);
-        XLSX.utils.book_append_sheet(wb, ws, 'Tổng Hợp Theo Loại Báo Cáo');
-        XLSX.writeFile(wb, `Tong_hop_Theo_Loai_BC_${new Date().getFullYear()}.xlsx`);
+        XLSX.utils.book_append_sheet(wb, ws, 'Hạng Theo Loại Báo Cáo');
+        XLSX.writeFile(wb, `Xep_Hang_${selectedReportType.replace(/\s+/g, '_')}_${new Date().getFullYear()}.xlsx`);
+      }
+      else if (subTab === 'report-tracking') {
+        const sheetData = filteredTrackingReports.map((s, i) => ({
+          'STT': i + 1,
+          'Tên Đơn Vị': s.Ten_Don_Vi,
+          'Nội Dung Báo Cáo': s.Ten_Bao_Cao,
+          'Phòng Ban Giao': s.Ten_Phong,
+          'Hạn Nộp': s.Han_Nop,
+          'Ngày Nộp Thực Tế': s.Ngay_Nop || 'Chưa nộp',
+          'Trạng Thái Nộp': s.Ngay_Nop ? ((s.So_Ngay_Tre ?? 0) > 0 ? `Trễ ${s.So_Ngay_Tre} ngày` : 'Đúng hạn') : 'Chưa nộp',
+          'Điểm Thời Gian': s.Diem_Thoi_Gian ?? 0,
+          'Điểm Chất Lượng': s.Diem_Chat_Luong ?? 'Chưa chấm',
+          'Tổng Điểm': s.Tong_Diem ?? 0
+        }));
+        const ws = XLSX.utils.json_to_sheet(sheetData);
+        XLSX.utils.book_append_sheet(wb, ws, 'Theo Dõi Giao Nhận');
+        XLSX.writeFile(wb, `Theo_Doi_Bao_Cao_${new Date().getFullYear()}.xlsx`);
       }
     } catch (e: any) {
-      alert(`Không thể xuất excel: ${e.message}`);
+      alert(`Không thể xuất xlsx: ${e.message}`);
     }
   };
-
-  // --- EXCEL DOWNLOAD CURRENT DATA RAW MATRIX ---
-  const handleExportExactlyRawFormat = () => {
-    try {
-      const wb = XLSX.utils.book_new();
-      
-      // Exact columns requested: Ma_DV, Ma_Phong, Ten_Bao_Cao, Loai_BC, Han_Nop, Diem_TG, Diem_Dinh_Muc, So_Ngay_Tre
-      const requestedRows = submissions.map((s, index) => ({
-        'STT': index + 1,
-        'Ma_DV': s.Ma_DV,
-        'Ma_Phong': s.Ma_Phong,
-        'Ten_Bao_Cao': s.Ten_Bao_Cao,
-        'Loai_BC': s.Loai_BC,
-        'Han_Nop': s.Han_Nop,
-        'Diem_TG': s.Diem_Thoi_Gian !== null ? s.Diem_Thoi_Gian : 0,
-        'Diem_Dinh_Muc': s.Diem_Dinh_Muc,
-        'So_Ngay_Tre': s.So_Ngay_Tre !== null ? s.So_Ngay_Tre : 0
-      }));
-
-      const ws = XLSX.utils.json_to_sheet(requestedRows);
-      XLSX.utils.book_append_sheet(wb, ws, 'DuLieu_ChiTiet');
-      
-      // Write file
-      XLSX.writeFile(wb, `Du_Lieu_Chi_Tiet_Bao_Cao_Giao_Diem_${new Date().getFullYear()}.xlsx`);
-      alert('Đã xuất file bảng kê chi tiết chính xác 8 cột theo yêu cầu!');
-
-    } catch (err: any) {
-      alert(`Lỗi xuất Excel: ${err.message}`);
-    }
-  };
-
 
   return (
     <div className="space-y-6" id="summary-management-menu">
       
-      {/* SECTION HEADER BLOCK */}
-      <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-5 relative overflow-hidden">
-        <div className="absolute right-0 top-0 w-24 h-24 bg-sky-500/5 rounded-full blur-xl pointer-events-none" />
-        <div className="space-y-1.5 flex-1 text-left">
-          <div className="flex items-center gap-2">
-            <span className="p-2 bg-indigo-50 text-indigo-700 rounded-xl">
-              <Layers className="w-5 h-5 text-indigo-600" />
+      {/* EXQUISITE SECTION HEADER */}
+      <div className="bg-white p-6 rounded-2xl border border-slate-300 shadow-md flex flex-col md:flex-row md:items-center md:justify-between gap-5 relative overflow-hidden">
+        <div className="absolute right-0 top-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-2xl pointer-events-none" />
+        <div className="space-y-2 flex-1 text-left">
+          <div className="flex items-center gap-3">
+            <span className="p-2.5 bg-indigo-700 text-white rounded-xl shadow-md">
+              <Layers3 className="w-6 h-6 animate-pulse" />
             </span>
-            <h2 className="text-lg font-black text-slate-800 tracking-tight uppercase">Menu Tổng hợp Báo cáo chỉ tiêu</h2>
+            <div>
+              <h2 className="text-2xl font-black text-slate-900 tracking-tight uppercase leading-none font-sans drop-shadow-xs">Tổng Hợp & Đánh Giá Chỉ Số Thi Đua</h2>
+              <p className="text-xs text-slate-600 font-extrabold mt-1">
+                Bảng phân dạng báo cáo, kết xuất hồ sơ thi đua tự động của 14 đơn vị thống kê cơ sở
+              </p>
+            </div>
           </div>
-          <p className="text-xs text-slate-500 leading-relaxed font-sans">
-            Hệ thống tự động biên dịch, chia nhóm gom số liệu và tổng hợp theo từng tiêu điểm nghiệp vụ phục vụ cơ chế thi đua công bằng.
-          </p>
         </div>
 
-        {/* Export exact raw table requested */}
+        {/* Unified Excel Download button */}
         <div className="flex flex-wrap items-center gap-2 shrink-0">
           <button 
-            onClick={handleExportExactlyRawFormat}
-            className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold rounded-xl text-xs transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-emerald-500/10"
+            type="button"
+            onClick={handleExportToExcel}
+            className="px-5 py-3 bg-emerald-700 hover:bg-emerald-600 active:scale-95 text-white font-black rounded-xl text-xs transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md"
           >
             <FileSpreadsheet className="w-4 h-4 text-emerald-100" />
-            <span>Tải Excel Chi Tiết 8 Cột</span>
+            <span>XUẤT BẢNG TÍNH EXCEL</span>
           </button>
         </div>
       </div>
 
-      {/* THREE MAIN MENU SUB-TABS */}
-      <div className="bg-white p-2.5 rounded-2xl border border-slate-100 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
+      {/* 4 MODERN MULTI-TABS INTERFACE */}
+      <div className="bg-white p-3.5 rounded-2xl border border-slate-300 shadow-sm flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
         
-        {/* Navigation Tabs */}
-        <div className="flex flex-wrap p-1 bg-slate-100/80 rounded-xl gap-1 w-full sm:w-auto">
+        {/* The 4 Tab buttons */}
+        <div className="grid grid-cols-2 md:flex md:flex-wrap p-1.5 bg-slate-100 rounded-2xl gap-1.5 w-full lg:w-auto border border-slate-200">
           <button
             type="button"
             onClick={() => { setSubTab('by-unit'); setSearchTerm(''); }}
-            className={`px-4 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer flex items-center gap-1.5 w-full sm:w-auto justify-center ${subTab === 'by-unit' ? 'bg-white text-indigo-600 shadow-xs' : 'text-slate-500 hover:text-slate-700'}`}
+            className={`px-4 py-2.5 text-xs font-black rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 border ${subTab === 'by-unit' ? 'bg-indigo-700 text-white border-indigo-700 shadow-sm' : 'bg-transparent text-slate-700 border-transparent hover:bg-slate-200 hover:text-slate-900'}`}
           >
-            <Building2 className="w-4 h-4" />
-            <span>Tổng hợp Theo Đơn Vị</span>
+            <Building2 className="w-4 h-4 shrink-0" />
+            <span>1. Theo Đơn Vị</span>
           </button>
           
           <button
             type="button"
-            onClick={() => { setSubTab('by-dept'); setSearchTerm(''); }}
-            className={`px-4 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer flex items-center gap-1.5 w-full sm:w-auto justify-center ${subTab === 'by-dept' ? 'bg-white text-indigo-600 shadow-xs' : 'text-slate-500 hover:text-slate-700'}`}
+            onClick={() => { setSubTab('by-dept-rank'); setSearchTerm(''); }}
+            className={`px-4 py-2.5 text-xs font-black rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 border ${subTab === 'by-dept-rank' ? 'bg-indigo-700 text-white border-indigo-700 shadow-sm' : 'bg-transparent text-slate-700 border-transparent hover:bg-slate-200 hover:text-slate-900'}`}
           >
-            <Briefcase className="w-4 h-4" />
-            <span>Theo Phòng Phụ trách</span>
+            <Briefcase className="w-4 h-4 shrink-0" />
+            <span>2. Theo Phòng</span>
           </button>
 
           <button
             type="button"
-            onClick={() => { setSubTab('by-type'); setSearchTerm(''); }}
-            className={`px-4 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer flex items-center gap-1.5 w-full sm:w-auto justify-center ${subTab === 'by-type' ? 'bg-white text-indigo-600 shadow-xs' : 'text-slate-500 hover:text-slate-700'}`}
+            onClick={() => { setSubTab('by-type-rank'); setSearchTerm(''); }}
+            className={`px-4 py-2.5 text-xs font-black rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 border ${subTab === 'by-type-rank' ? 'bg-indigo-700 text-white border-indigo-700 shadow-sm' : 'bg-transparent text-slate-700 border-transparent hover:bg-slate-200 hover:text-slate-900'}`}
           >
-            <Activity className="w-4 h-4" />
-            <span>Theo Loại báo cáo</span>
+            <Activity className="w-4 h-4 shrink-0" />
+            <span>3. Theo Loại Báo Cáo</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => { setSubTab('report-tracking'); setSearchTerm(''); }}
+            className={`px-4 py-2.5 text-xs font-black rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 border ${subTab === 'report-tracking' ? 'bg-indigo-700 text-white border-indigo-700 shadow-sm' : 'bg-transparent text-slate-700 border-transparent hover:bg-slate-200 hover:text-slate-900'}`}
+          >
+            <Clock className="w-4 h-4 shrink-0" />
+            <span>4. Theo Dõi Báo Cáo</span>
           </button>
         </div>
 
-        {/* Right Search Bar Controls mapping */}
-        <div className="flex items-center gap-2 w-full sm:w-auto relative">
-          <div className="relative w-full sm:w-60">
-            <Search className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
+        {/* Dynamic Filters layout depending on the selected Tab */}
+        <div className="flex flex-wrap lg:flex-nowrap items-center gap-2.5 w-full lg:w-auto">
+          
+          {/* Universal Search bar for titles */}
+          <div className="relative flex-1 lg:flex-none">
+            <Search className="absolute left-3 top-2.5 w-4 h-4 text-slate-500" />
             <input
               type="text"
-              placeholder="Tìm tên hoặc mã..."
+              placeholder={
+                subTab === 'report-tracking' 
+                  ? "Tìm tên đơn vị hoặc báo cáo..." 
+                  : "Tìm nhanh tên đơn vị..."
+              }
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 pl-9 pr-3 py-2 text-xs rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/10 placeholder-slate-400"
+              className="w-full lg:w-56 bg-slate-50 border border-slate-350 pl-9 pr-3 py-2 text-xs rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 font-bold placeholder-slate-400 text-slate-900"
             />
           </div>
 
-          {/* Region filter specifically for unit subgroup */}
+          {/* Tab 1 region filter */}
           {subTab === 'by-unit' && (
             <select
               value={regionFilter}
               onChange={(e: any) => setRegionFilter(e.target.value)}
-              className="bg-slate-50 border border-slate-200 text-xs rounded-xl px-2.5 py-2 text-slate-600 font-bold focus:outline-none cursor-pointer"
+              className="bg-slate-50 border border-slate-350 text-xs rounded-xl px-3 py-2 text-slate-950 font-black focus:outline-none cursor-pointer focus:ring-2 focus:ring-indigo-500/20"
             >
-              <option value="ALL">Tất cả Vùng</option>
+              <option value="ALL">👉 Tất cả Vùng</option>
               <option value="VUNG1">Khu vực 1</option>
               <option value="VUNG2">Khu vực 2</option>
             </select>
           )}
 
-          {/* Quick Excel download for this specific summary table */}
-          <button 
-            type="button"
-            onClick={handleExportSelectedSummaryTable}
-            title="Xuất bảng tổng hợp hiện tại ra Excel"
-            className="p-2 border border-slate-200 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer text-slate-500"
-          >
-            <Download className="w-4 h-4 text-slate-500" />
-          </button>
+          {/* Tab 2 Department filter */}
+          {subTab === 'by-dept-rank' && (
+            <select
+              value={selectedDept}
+              onChange={(e) => setSelectedDept(e.target.value)}
+              className="bg-sky-50 border border-indigo-300 text-xs rounded-xl px-3 py-2 text-indigo-955 font-black focus:outline-none cursor-pointer focus:ring-2 focus:ring-indigo-500/20"
+            >
+              {departments.map(d => (
+                <option key={d.Ma_Phong} value={d.Ma_Phong}>🏢 {d.Ten_Phong}</option>
+              ))}
+            </select>
+          )}
+
+          {/* Tab 3 Report Category filter */}
+          {subTab === 'by-type-rank' && (
+            <select
+              value={selectedReportType}
+              onChange={(e) => setSelectedReportType(e.target.value)}
+              className="bg-sky-50 border border-indigo-300 text-xs rounded-xl px-3 py-2 text-indigo-955 font-black focus:outline-none cursor-pointer focus:ring-2 focus:ring-indigo-500/20"
+            >
+              <option value="Báo cáo nhanh">⚡ Báo cáo nhanh</option>
+              <option value="Báo cáo phân tích">📊 Báo cáo phân tích</option>
+              <option value="Báo cáo tháng">📅 Báo cáo tháng</option>
+              <option value="Báo cáo năm">🌟 Báo cáo năm</option>
+            </select>
+          )}
+
+          {/* Tab 4 Tracking Status filter */}
+          {subTab === 'report-tracking' && (
+            <select
+              value={trackingFilter}
+              onChange={(e) => setTrackingFilter(e.target.value)}
+              className="bg-indigo-50 border border-indigo-300 text-xs rounded-xl px-3 py-2 text-indigo-950 font-black focus:outline-none cursor-pointer focus:ring-2 focus:ring-indigo-500/20"
+            >
+              <option value="ALL">🔍 Tất cả báo cáo</option>
+              <option value="DUE_NOT_SUBMITTED">⚠️ Báo cáo đến hạn chưa gửi</option>
+              <option value="ON_TIME">✅ Báo cáo đúng hạn</option>
+              <option value="LATE">⏰ Báo cáo trễ hạn</option>
+              <option value="UNGRADED">📝 Báo cáo chưa chấm</option>
+              <option value="GRADED">⭐ Báo cáo đã chấm</option>
+              <option value="NOT_SUBMITTED">❌ Báo cáo chưa gửi</option>
+              <option value="SUBMITTED">📥 Báo cáo đã gửi</option>
+            </select>
+          )}
+
         </div>
       </div>
 
-      {/* MAIN AGGREGATED DISPLAY CONTENT GRID */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden text-left">
+      {/* DYNAMIC RESULTS CONTAINER */}
+      <div className="bg-white rounded-2xl border border-slate-350 shadow-md overflow-hidden text-left">
         
-        {/* VIEW 1: TỔNG HỢP THEO ĐƠN VỊ */}
+        {/* ==================== VIEW 1: TỔNG HỢP THEO ĐƠN VỊ ==================== */}
         {subTab === 'by-unit' && (
           <div className="overflow-x-auto">
-            <table className="w-full text-left font-sans text-xs border-collapse">
+            <table className="w-full text-left font-sans text-xs border border-slate-300 border-collapse table-auto">
               <thead>
-                <tr className="bg-slate-50/70 border-b border-slate-100 text-[10px] text-slate-400 font-black uppercase font-mono tracking-wider">
-                  <th className="py-3 px-4 text-center w-12">STT</th>
-                  <th className="py-3 px-4">Mã DV</th>
-                  <th className="py-3 px-4">Tên huyện / chi cục / đơn vị</th>
-                  <th className="py-3 px-3 text-center">Địa bàn</th>
-                  <th className="py-3 px-3 text-center">Giao</th>
-                  <th className="py-3 px-3 text-center">Đã Nộp</th>
-                  <th className="py-3 px-3 text-center">Đúng hạn</th>
-                  <th className="py-3 px-3 text-center">Đế trễ</th>
-                  <th className="py-3 px-3 text-center bg-slate-150/50">Trễ hạn (chưa nộp)</th>
-                  <th className="py-3 px-3 text-center bg-sky-50 text-indigo-900">Điểm TG</th>
-                  <th className="py-3 px-3 text-center bg-indigo-50/40 text-indigo-900">Chuẩn CL</th>
-                  <th className="py-3 px-4 text-center bg-indigo-50 text-indigo-700 font-bold border-l border-indigo-100">Tổng điểm</th>
-                  <th className="py-3 px-4 text-center border-l border-slate-100">Chỉ số thi đua</th>
+                <tr className="bg-slate-100 border-b border-slate-300 text-xs text-slate-705 font-semibold normal-case">
+                  <th className="py-3 px-3 text-center w-12 border border-slate-300 text-slate-700 font-semibold bg-slate-100">STT</th>
+                  <th className="py-3 px-3 text-center w-20 border border-slate-300 text-slate-700 font-semibold bg-slate-100">Mã đơn vị</th>
+                  <th className="py-3 px-4 text-left border border-slate-300 text-slate-700 font-semibold bg-slate-100">Tên đơn vị Thống kê</th>
+                  <th className="py-3 px-3 text-center w-24 border border-slate-300 text-slate-700 font-semibold bg-slate-100">Vùng</th>
+                  <th className="py-3 px-3 text-center w-24 border border-slate-300 text-slate-700 font-semibold bg-slate-100">Chỉ tiêu giao</th>
+                  <th className="py-3 px-3 text-center bg-sky-100/50 text-sky-950 border border-slate-300 font-semibold">Điểm thời gian</th>
+                  <th className="py-3 px-3 text-center bg-indigo-50 text-indigo-950 border border-slate-300 font-semibold">Điểm chất lượng</th>
+                  <th className="py-3 px-4 text-center bg-indigo-100 text-indigo-950 border border-slate-300 font-semibold font-sans">Tổng điểm thực đạt</th>
+                  <th className="py-3 px-4 text-center w-36 border border-slate-300 text-slate-700 font-semibold font-sans">Chỉ số thi đua (%)</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 font-sans text-[11.5px]">
+              <tbody className="divide-y divide-slate-300 font-sans text-[11.5px]">
                 {filteredUnitSummaries.length > 0 ? (
                   filteredUnitSummaries.map((u, index) => (
-                    <tr key={u.Ma_DV} className="hover:bg-slate-50/50 transition-colors">
-                      <td className="py-3.5 px-4 text-center font-mono font-bold text-slate-400">{index + 1}</td>
-                      <td className="py-3.5 px-4 font-mono font-bold text-indigo-800">{u.Ma_DV}</td>
-                      <td className="py-3.5 px-4">
-                        <div className="font-extrabold text-slate-800 leading-snug">{u.Ten_Don_Vi}</div>
-                      </td>
-                      <td className="py-3.5 px-3 text-center">
-                        <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${u.Vung === 'Khu vực 1' ? 'text-sky-700 bg-sky-50' : 'text-slate-600 bg-slate-100'}`}>
+                    <tr key={u.Ma_DV} className="hover:bg-indigo-50/50 transition-colors">
+                      <td className="py-3 px-3 text-center font-mono font-semibold text-slate-650 border border-slate-300 bg-slate-50">{index + 1}</td>
+                      <td className="py-3 px-3 text-center font-mono font-semibold text-indigo-805 border border-slate-300 bg-slate-50">{u.Ma_DV}</td>
+                      <td className="py-3 px-4 font-bold text-slate-800 border border-slate-300 bg-white">{u.Ten_Don_Vi}</td>
+                      <td className="py-3 px-3 text-center border border-slate-300 bg-white">
+                        <span className={`px-2 py-0.5 rounded-lg text-[10px] font-semibold tracking-wide ${u.Vung === 'Khu vực 1' ? 'text-sky-700 bg-sky-50 border border-sky-200' : 'text-slate-800 bg-slate-200 border border-slate-300'}`}>
                           {u.Vung}
                         </span>
                       </td>
-                      <td className="py-3.5 px-3 text-center font-mono font-bold text-slate-700">{u.Tong_Bao_Cao}</td>
-                      <td className="py-3.5 px-3 text-center font-mono text-slate-600">{u.Da_Nop}</td>
-                      <td className="py-3.5 px-3 text-center font-mono">
-                        <span className="text-emerald-600 font-bold bg-emerald-50 px-1.5 py-0.5 rounded">
-                          {u.Dung_Han}
+                      <td className="py-3 px-3 text-center font-mono font-semibold text-slate-700 border border-slate-300 bg-white">{u.Tong_Bao_Cao}</td>
+                      <td className="py-3 px-3 text-center font-mono bg-sky-50/30 font-semibold text-sky-850 border border-slate-300">{u.Diem_TG}</td>
+                      <td className="py-3 px-3 text-center font-mono bg-indigo-50/20 font-semibold text-slate-700 border border-slate-300">{u.Diem_Chat_Luong}</td>
+                      <td className="py-3 px-4 text-center font-mono bg-indigo-55/40 text-indigo-950 font-semibold text-xs border border-slate-300">
+                        <div className="text-sm font-bold text-indigo-950">{u.Tong_Diem}</div>
+                        <span className="text-[9.5px] text-slate-550 font-medium block leading-none mt-0.5">Xếp ĐM {u.Diem_Dinh_Muc}</span>
+                      </td>
+                      <td className="py-3 px-4 text-center border border-slate-300 bg-emerald-50/20">
+                        <span className="font-mono font-bold text-emerald-850 bg-emerald-100/90 border border-emerald-350 px-2.5 py-1 rounded-lg text-[11px] inline-block shadow-sm">
+                          {u.Diem_Thi_Dua_Phan_Tram}%
                         </span>
                       </td>
-                      <td className="py-3.5 px-3 text-center font-mono text-amber-600">{u.Trere_Han}</td>
-                      <td className="py-3.5 px-3 text-center font-mono">
-                        {u.Chua_Nop > 0 ? (
-                          <span className="text-rose-600 font-bold bg-rose-55 px-1.5 py-0.5 rounded animate-pulse">
-                            {u.Chua_Nop}
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={9} className="py-12 text-center text-slate-500 font-extrabold font-sans border border-slate-300">
+                      Không tìm thấy đơn vị nào phù hợp điều kiện lọc!
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* ==================== VIEW 2: TỔNG HỢP THEO PHÒNG BAN (RANKED 1 - 14) ==================== */}
+        {subTab === 'by-dept-rank' && (
+          <div className="overflow-x-auto">
+            
+            {/* Header banner stating chosen department */}
+            <div className="bg-indigo-50 p-4 border-b border-slate-300 text-left flex items-center justify-between">
+              <div>
+                <span className="text-[10px] text-indigo-805 font-black uppercase font-mono tracking-wider block">Lĩnh vực nghiệp vụ phụ trách:</span>
+                <strong className="text-base font-black text-indigo-950 font-sans tracking-tight">
+                  {departments.find(d => d.Ma_Phong === selectedDept)?.Ten_Phong || 'Lĩnh vực chọn'}
+                </strong>
+              </div>
+              <span className="text-[10px] bg-indigo-700 text-white font-black px-3 py-1 rounded-full uppercase border border-indigo-850 shadow-xs">
+                Bảng xếp hạng 14 đơn vị
+              </span>
+            </div>
+
+            <table className="w-full text-left font-sans text-xs border border-slate-300 border-collapse table-auto">
+              <thead>
+                <tr className="bg-slate-100 border-b border-slate-300 text-[11px] text-slate-800 font-extrabold uppercase font-sans tracking-wide">
+                  <th className="py-4 px-4 text-center w-24 border border-slate-300 text-slate-800 font-black">Thứ Hạng</th>
+                  <th className="py-4 px-3 text-center w-24 border border-slate-300 text-slate-800 font-black">Mã Đơn Vị</th>
+                  <th className="py-4 px-4 text-left border border-slate-300 text-slate-800 font-black">Đơn vị thống kê cơ sở</th>
+                  <th className="py-4 px-3 text-center w-28 border border-slate-300 text-slate-800 font-black">Tổng Chỉ Tiêu</th>
+                  <th className="py-4 px-3 text-center w-28 border border-slate-300 text-slate-800 font-black">Đã Giao Nộp</th>
+                  <th className="py-4 px-3 text-center bg-sky-100/60 text-sky-950 border border-slate-300 font-black">Điểm Thời Gian</th>
+                  <th className="py-4 px-3 text-center bg-indigo-100/50 text-indigo-950 border border-slate-300 font-black">Điểm Chuyên Môn</th>
+                  <th className="py-4 px-4 text-center bg-indigo-100 text-indigo-950 border border-slate-300 font-black">Điểm Thực Đạt</th>
+                  <th className="py-4 px-4 text-center border border-slate-300 text-slate-800 font-black">Chỉ Số Thi Đua (%)</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-300 font-sans text-[11.5px]">
+                {rankedUnitsDept.length > 0 ? (
+                  rankedUnitsDept.map((u, index) => {
+                    const getRankingBadge = (rank: number) => {
+                      if (rank === 1) return 'bg-amber-100 text-amber-900 border border-amber-350 font-black';
+                      if (rank === 2) return 'bg-slate-150 text-slate-850 border border-slate-300 font-black';
+                      if (rank === 3) return 'bg-orange-105 text-orange-900 border border-orange-350 font-black';
+                      return 'bg-slate-100 text-slate-700 font-bold';
+                    };
+
+                    return (
+                      <tr key={u.Ma_DV} className="hover:bg-indigo-50/50 transition-colors">
+                        <td className="py-3 px-4 text-center border border-slate-300 bg-slate-50">
+                          <span className={`inline-block px-2.5 py-1 rounded-lg text-xs font-mono font-black ${getRankingBadge(index + 1)}`}>
+                            Hạng {index + 1}
                           </span>
-                        ) : (
-                          <span className="text-slate-400">-</span>
-                        )}
-                      </td>
-                      <td className="py-3.5 px-3 text-center font-mono bg-indigo-50/10 font-semibold text-indigo-700">{u.Diem_TG}</td>
-                      <td className="py-3.5 px-3 text-center font-mono bg-indigo-50/5 text-slate-700">{u.Diem_Chat_Luong}</td>
-                      <td className="py-3.5 px-4 text-center font-mono bg-indigo-50/50 text-indigo-850 font-black border-l border-indigo-100/50 text-xs">
-                        {u.Tong_Diem}
-                        <div className="text-[9px] text-slate-400 font-medium font-mono leading-none mt-0.5">Max {u.Diem_Dinh_Muc}</div>
-                      </td>
-                      <td className="py-3.5 px-4 text-center border-l border-slate-100">
-                        <div className="flex items-center justify-center gap-2">
-                          <div className="w-12 bg-slate-100 h-2 rounded-full overflow-hidden hidden sm:block">
-                            <div className="bg-emerald-500 h-full rounded-full" style={{ width: `${u.Diem_Thi_Dua_Phan_Tram}%` }} />
-                          </div>
-                          <span className="font-mono font-black text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded text-[11px]">
+                        </td>
+                        <td className="py-3 px-3 text-center font-mono font-black text-indigo-805 border border-slate-300 bg-slate-50">{u.Ma_DV}</td>
+                        <td className="py-3 px-4 border border-slate-300 bg-white">
+                          <div className="font-black text-slate-900 leading-snug">{u.Ten_Don_Vi}</div>
+                          <span className="text-[10px] text-slate-500 font-sans block mt-0.5">{u.Vung}</span>
+                        </td>
+                        <td className="py-3 px-3 text-center font-mono font-black text-slate-800 border border-slate-300 bg-white">{u.Tong_Bao_Cao}</td>
+                        <td className="py-3 px-3 text-center font-mono text-emerald-750 font-black border border-slate-300 bg-emerald-50/10">
+                          {u.Da_Nop} / {u.Tong_Bao_Cao}
+                        </td>
+                        <td className="py-3 px-3 text-center font-mono bg-sky-50/30 text-sky-850 font-black border border-slate-300">{u.Diem_TG}</td>
+                        <td className="py-3 px-3 text-center font-mono bg-indigo-50/20 text-slate-800 font-black border border-slate-300">{u.Diem_Chat_Luong}</td>
+                        <td className="py-3 px-4 text-center font-mono bg-indigo-55/40 text-indigo-950 font-black text-xs border border-slate-300">
+                          <div className="text-sm font-black text-indigo-950">{u.Tong_Diem}</div>
+                          <span className="text-[9.5px] text-slate-550 font-bold block mt-0.5 text-center leading-none">Max {u.Diem_Dinh_Muc}</span>
+                        </td>
+                        <td className="py-3 px-4 text-center border border-slate-300 bg-indigo-50/10">
+                          <span className="font-mono font-black text-indigo-800 bg-indigo-100 border border-indigo-250 px-2.5 py-1 rounded-lg text-[11px] inline-block shadow-3xs">
                             {u.Diem_Thi_Dua_Phan_Tram}%
                           </span>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
+                        </td>
+                      </tr>
+                    );
+                  })
                 ) : (
                   <tr>
-                    <td colSpan={13} className="py-8 text-center text-slate-400">Không tìm thấy đơn vị phù hợp</td>
+                    <td colSpan={9} className="py-12 text-center text-slate-500 font-sans border border-slate-300">
+                      Không tìm thấy dữ liệu xếp hạng theo phòng chuyên môn phù hợp!
+                    </td>
                   </tr>
                 )}
               </tbody>
@@ -451,64 +567,80 @@ export default function SummaryMenu({ submissions, departments, units }: Summary
           </div>
         )}
 
-        {/* VIEW 2: TỔNG HỢP THEO PHÒNG BAN PHỤ TRÁCH */}
-        {subTab === 'by-dept' && (
+        {/* ==================== VIEW 3: TỔNG HỢP THEO LOẠI BÁO CÁO (RANKED 1 - 14) ==================== */}
+        {subTab === 'by-type-rank' && (
           <div className="overflow-x-auto">
-            <table className="w-full text-left font-sans text-xs border-collapse">
+            
+            {/* Header banner showing chosen report type */}
+            <div className="bg-emerald-50 p-4 border-b border-slate-300 text-left flex items-center justify-between">
+              <div>
+                <span className="text-[10px] text-emerald-805 font-black uppercase font-mono tracking-wider block">Phân loại chỉ tiêu:</span>
+                <strong className="text-base font-black text-emerald-955 font-sans tracking-tight">{selectedReportType}</strong>
+              </div>
+              <span className="text-[10px] bg-emerald-700 text-white font-black px-3 py-1 rounded-full uppercase border border-emerald-850 shadow-xs">
+                Bảng xếp hạng 14 cơ sở
+              </span>
+            </div>
+
+            <table className="w-full text-left font-sans text-xs border border-slate-300 border-collapse table-auto">
               <thead>
-                <tr className="bg-slate-50/70 border-b border-slate-100 text-[10px] text-slate-400 font-black uppercase font-mono tracking-wider">
-                  <th className="py-3 px-4 text-center w-12">STT</th>
-                  <th className="py-3 px-4">Mã Phòng</th>
-                  <th className="py-3 px-4">Tên phòng ban nghiệp vụ phụ trách</th>
-                  <th className="py-3 px-3 text-center">Tổng báo cáo giao</th>
-                  <th className="py-3 px-3 text-center">Đã nhận nộp</th>
-                  <th className="py-3 px-3 text-center">Nộp chuẩn thời gian</th>
-                  <th className="py-3 px-3 text-center">Quá hạn chưa thu</th>
-                  <th className="py-3 px-3 text-center bg-sky-50 text-sky-900 border-l border-sky-100">Điểm TG đạt</th>
-                  <th className="py-3 px-3 text-center bg-indigo-50/40 text-indigo-900">Điểm chuyên môn</th>
-                  <th className="py-3 px-4 text-center bg-indigo-50 font-black text-indigo-700 border-l border-indigo-100">Tổng điểm</th>
-                  <th className="py-3 px-3 text-center">Bình quân ngày trễ</th>
-                  <th className="py-3 px-4 text-center border-l border-slate-100">Hiệu suất phòng</th>
+                <tr className="bg-slate-100 border-b border-slate-300 text-xs text-slate-705 font-semibold normal-case">
+                  <th className="py-3 px-4 text-center w-24 border border-slate-300 text-slate-700 font-semibold">Thứ hạng</th>
+                  <th className="py-3 px-3 text-center w-24 border border-slate-300 text-slate-700 font-semibold">Mã đơn vị</th>
+                  <th className="py-3 px-4 text-left border border-slate-300 text-slate-700 font-semibold">Đơn vị Thống kê cơ sở</th>
+                  <th className="py-3 px-3 text-center w-28 border border-slate-300 text-slate-700 font-semibold">Tổng chỉ tiêu</th>
+                  <th className="py-3 px-3 text-center w-28 border border-slate-300 text-slate-700 font-semibold">Đã giao nộp</th>
+                  <th className="py-3 px-3 text-center bg-sky-100/50 text-sky-950 border border-slate-300 font-semibold">Điểm thời gian</th>
+                  <th className="py-3 px-3 text-center bg-indigo-50 text-indigo-950 border border-slate-300 font-semibold">Điểm chất lượng</th>
+                  <th className="py-3 px-4 text-center bg-indigo-100 text-indigo-950 border border-slate-300 font-semibold">Tổng điểm đạt</th>
+                  <th className="py-3 px-4 text-center border border-slate-300 text-slate-700 font-semibold">Chỉ số thi đua (%)</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 font-sans text-[11.5px]">
-                {filteredDeptSummaries.length > 0 ? (
-                  filteredDeptSummaries.map((d, index) => (
-                    <tr key={d.Ma_Phong} className="hover:bg-slate-50/50 transition-colors">
-                      <td className="py-3.5 px-4 text-center font-mono font-bold text-slate-400">{index + 1}</td>
-                      <td className="py-3.5 px-4 font-mono font-bold text-indigo-800">{d.Ma_Phong}</td>
-                      <td className="py-3.5 px-4">
-                        <div className="font-extrabold text-slate-800 leading-snug">{d.Ten_Phong}</div>
-                      </td>
-                      <td className="py-3.5 px-3 text-center font-mono font-bold text-slate-700">{d.Tong_Bao_Cao}</td>
-                      <td className="py-3.5 px-3 text-center font-mono text-slate-600">{d.Da_Nop}</td>
-                      <td className="py-3.5 px-3 text-center font-mono text-emerald-600 font-semibold bg-emerald-50/30">{d.Dung_Han}</td>
-                      <td className="py-3.5 px-3 text-center font-mono text-rose-600 font-semibold bg-rose-50/30">{d.Chua_Nop}</td>
-                      <td className="py-3.5 px-3 text-center font-mono bg-sky-50/30 text-sky-800 border-l border-sky-100/50">{d.Diem_TG}</td>
-                      <td className="py-3.5 px-3 text-center font-mono bg-indigo-50/10 text-slate-600">{d.Diem_Chat_Luong}</td>
-                      <td className="py-3.5 px-4 text-center font-mono bg-indigo-50/40 text-indigo-900 font-black border-l border-indigo-100/50">
-                        {d.Tong_Diem}
-                        <div className="text-[9px] text-slate-400 font-mono mt-0.5 font-medium">Định mức {d.Diem_Dinh_Muc}</div>
-                      </td>
-                      <td className="py-3.5 px-3 text-center font-mono">
-                        {d.TB_Ngay_Tre > 0 ? (
-                          <span className="text-amber-700 font-bold bg-amber-50 px-1.5 py-0.5 rounded">
-                            {d.TB_Ngay_Tre} ngày
+              <tbody className="divide-y divide-slate-300 font-sans text-[11.5px]">
+                {rankedUnitsType.length > 0 ? (
+                  rankedUnitsType.map((u, index) => {
+                    const getRankingBadge = (rank: number) => {
+                      if (rank === 1) return 'bg-amber-100 text-amber-900 border border-amber-305 font-bold';
+                      if (rank === 2) return 'bg-slate-150 text-slate-850 border border-slate-300 font-bold';
+                      if (rank === 3) return 'bg-orange-105 text-orange-900 border border-orange-355 font-bold';
+                      return 'bg-slate-100 text-slate-750 font-bold';
+                    };
+
+                    return (
+                      <tr key={u.Ma_DV} className="hover:bg-indigo-50/50 transition-colors">
+                        <td className="py-3.5 px-4 text-center border border-slate-300 bg-slate-50">
+                          <span className={`inline-block px-2.5 py-1 rounded-lg text-xs font-mono font-bold ${getRankingBadge(index + 1)}`}>
+                            Hạng {index + 1}
                           </span>
-                        ) : (
-                          <span className="text-slate-400">0 ngày</span>
-                        )}
-                      </td>
-                      <td className="py-3.5 px-4 text-center border-l border-slate-100">
-                        <span className="font-mono font-black text-indigo-650 bg-indigo-50 px-1.5 py-0.5 rounded text-[11px]">
-                          {d.Diem_Thi_Dua_Phan_Tram}%
-                        </span>
-                      </td>
-                    </tr>
-                  ))
+                        </td>
+                        <td className="py-3.5 px-3 text-center font-mono font-semibold text-indigo-805 border border-slate-300 bg-slate-50">{u.Ma_DV}</td>
+                        <td className="py-3.5 px-4 border border-slate-300 bg-white">
+                          <div className="font-bold text-slate-800 leading-snug">{u.Ten_Don_Vi}</div>
+                          <span className="text-[10px] text-slate-500 font-mono block mt-0.5">{u.Vung}</span>
+                        </td>
+                        <td className="py-3.5 px-3 text-center font-mono font-semibold text-slate-700 border border-slate-300 bg-white">{u.Tong_Bao_Cao}</td>
+                        <td className="py-3.5 px-3 text-center font-mono text-emerald-750 font-semibold border border-slate-300 bg-emerald-50/10">
+                          {u.Da_Nop} / {u.Tong_Bao_Cao}
+                        </td>
+                        <td className="py-3.5 px-3 text-center font-mono bg-sky-50/30 text-sky-850 font-semibold border border-slate-300">{u.Diem_TG}</td>
+                        <td className="py-3.5 px-3 text-center font-mono bg-indigo-50/20 text-slate-700 font-semibold border border-slate-300">{u.Diem_Chat_Luong}</td>
+                        <td className="py-3.5 px-4 text-center font-mono bg-indigo-55/40 text-indigo-950 font-semibold text-xs border border-slate-300">
+                          <div className="text-sm font-bold text-indigo-950">{u.Tong_Diem}</div>
+                          <span className="text-[9.5px] text-slate-550 font-medium block mt-0.5 leading-none">ĐM {u.Diem_Dinh_Muc}</span>
+                        </td>
+                        <td className="py-3.5 px-4 text-center border border-slate-300 bg-indigo-50/10">
+                          <span className="font-mono font-bold text-indigo-800 bg-indigo-100 border border-indigo-250 px-2.5 py-1 rounded-lg text-[11px] inline-block shadow-sm">
+                            {u.Diem_Thi_Dua_Phan_Tram}%
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })
                 ) : (
                   <tr>
-                    <td colSpan={12} className="py-8 text-center text-slate-400">Không tìm thấy phòng ban nghiệp vụ phù hợp</td>
+                    <td colSpan={9} className="py-12 text-center text-slate-500 font-sans border border-slate-300">
+                      Không tìm thấy báo cáo phân loại tương ứng cho các cơ sở!
+                    </td>
                   </tr>
                 )}
               </tbody>
@@ -516,81 +648,99 @@ export default function SummaryMenu({ submissions, departments, units }: Summary
           </div>
         )}
 
-        {/* VIEW 3: TỔNG HỢP THEO LOẠI BÁO CÁO */}
-        {subTab === 'by-type' && (
+        {/* ==================== VIEW 4: THEO DÕI BÁO CÁO (REPORT TRACKING) ==================== */}
+        {subTab === 'report-tracking' && (
           <div className="overflow-x-auto">
-            <table className="w-full text-left font-sans text-xs border-collapse">
+            <table className="w-full text-left font-sans text-xs border border-slate-300 border-collapse table-auto">
               <thead>
-                <tr className="bg-slate-50/70 border-b border-slate-100 text-[10px] text-slate-400 font-black uppercase font-mono tracking-wider">
-                  <th className="py-3 px-4 text-center w-12">STT</th>
-                  <th className="py-3 px-4">Loại báo cáo</th>
-                  <th className="py-3 px-3 text-center">Tổng số lượt giao</th>
-                  <th className="py-3 px-3 text-center">Đã hoàn thành nộp</th>
-                  <th className="py-3 px-3 text-center">Số lượt nộp đúng hạn</th>
-                  <th className="py-3 px-3 text-center">Quá hạn chưa nộp</th>
-                  <th className="py-3 px-3 text-center bg-sky-50 text-sky-900 border-l border-sky-100">Tổng điểm TG</th>
-                  <th className="py-3 px-3 text-center bg-indigo-50/40 text-indigo-900">Tổng điểm CM</th>
-                  <th className="py-3 px-4 text-center bg-indigo-50 font-black text-indigo-700 border-l border-indigo-100">Tổng điểm đạt</th>
-                  <th className="py-3 px-3 text-center">Trễ hạn bình quân</th>
-                  <th className="py-3 px-4 text-center border-l border-slate-100">Chỉ số thi đua</th>
+                <tr className="bg-slate-100 border-b border-slate-300 text-[11px] text-slate-800 font-extrabold uppercase font-sans tracking-wide">
+                  <th className="py-4 px-3 text-center w-12 border border-slate-300 text-slate-850 font-black">STT</th>
+                  <th className="py-4 px-4 text-left border border-slate-300 text-slate-850 font-black">Cơ Sở Nộp</th>
+                  <th className="py-4 px-4 text-left border border-slate-300 text-slate-850 font-black">Nội Dung Chỉ Tiêu Báo Cáo</th>
+                  <th className="py-4 px-3 text-left border border-slate-300 text-slate-850 font-black">Phòng Giao Ban</th>
+                  <th className="py-4 px-3 text-center border border-slate-300 text-slate-850 font-black">Kỳ Hạn Nộp</th>
+                  <th className="py-4 px-3 text-center border border-slate-300 text-slate-850 font-black">Ngày Nộp</th>
+                  <th className="py-4 px-3 text-center border border-slate-300 text-slate-850 font-black">Trạng Thái</th>
+                  <th className="py-4 px-3 text-center bg-sky-100/60 text-sky-950 border border-slate-300 font-black">Điểm TG</th>
+                  <th className="py-4 px-3 text-center bg-indigo-100/50 text-indigo-950 border border-slate-300 font-black">Điểm CL</th>
+                  <th className="py-4 px-4 text-center bg-indigo-100 text-indigo-950 border border-slate-300 font-black">Tổng Đạt</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 font-sans text-[11.5px]">
-                {filteredTypeSummaries.length > 0 ? (
-                  filteredTypeSummaries.map((t, index) => (
-                    <tr key={t.Loai_BC} className="hover:bg-slate-50/50 transition-colors">
-                      <td className="py-3.5 px-4 text-center font-mono font-bold text-slate-400">{index + 1}</td>
-                      <td className="py-3.5 px-4">
-                        <span className="font-extrabold text-slate-800 bg-slate-100 px-2 py-1 rounded-md text-[11px]">
-                          {t.Loai_BC}
-                        </span>
-                      </td>
-                      <td className="py-3.5 px-3 text-center font-mono font-bold text-slate-700">{t.Tong_Bao_Cao}</td>
-                      <td className="py-3.5 px-3 text-center font-mono text-slate-600">{t.Da_Nop}</td>
-                      <td className="py-3.5 px-3 text-center font-mono text-emerald-600 bg-emerald-50/20">{t.Dung_Han}</td>
-                      <td className="py-3.5 px-3 text-center font-mono text-rose-600 bg-rose-50/20">{t.Chua_Nop}</td>
-                      <td className="py-3.5 px-3 text-center font-mono bg-sky-50/20 text-sky-800 border-l border-sky-100/50">{t.Diem_TG}</td>
-                      <td className="py-3.5 px-3 text-center font-mono bg-indigo-50/10 text-slate-600">{t.Diem_Chat_Luong}</td>
-                      <td className="py-3.5 px-4 text-center font-mono bg-indigo-50/40 text-indigo-900 font-black border-l border-indigo-100/50">
-                        {t.Tong_Diem}
-                        <div className="text-[9px] text-slate-400 font-mono mt-0.5 font-medium">Định mức {t.Diem_Dinh_Muc}</div>
-                      </td>
-                      <td className="py-3.5 px-3 text-center font-mono">
-                        {t.TB_Ngay_Tre > 0 ? (
-                          <span className="text-amber-700 font-semibold bg-amber-50 px-1 rounded">
-                            {t.TB_Ngay_Tre} ngày
+              <tbody className="divide-y divide-slate-300 font-sans text-[11.5px]">
+                {filteredTrackingReports.length > 0 ? (
+                  filteredTrackingReports.map((s, index) => {
+                    const isSubmitted = s.Ngay_Nop !== null;
+                    const isLate = isSubmitted && (s.So_Ngay_Tre ?? 0) > 0;
+                    
+                    let statusLabel = 'Chưa nộp';
+                    let statusClass = 'bg-rose-50 text-rose-800 border-rose-250';
+
+                    if (isSubmitted) {
+                      if (isLate) {
+                        statusLabel = `Trễ ${s.So_Ngay_Tre} ngày`;
+                        statusClass = 'bg-amber-50 text-amber-850 border-amber-300';
+                      } else {
+                        statusLabel = 'Đúng hạn';
+                        statusClass = 'bg-emerald-50 text-emerald-850 border-emerald-300';
+                      }
+                    }
+
+                    return (
+                      <tr key={s.ID} className="hover:bg-indigo-50/50 transition-colors">
+                        <td className="py-3 px-3 text-center font-mono font-black text-slate-500 border border-slate-300 bg-slate-50">{index + 1}</td>
+                        <td className="py-3 px-4 font-black text-slate-900 border border-slate-300 bg-white">{s.Ten_Don_Vi}</td>
+                        <td className="py-3 px-4 border border-slate-300 bg-white">
+                          <div className="font-semibold text-slate-900 leading-relaxed font-sans">{s.Ten_Bao_Cao}</div>
+                          <span className="text-[10px] text-slate-500 font-mono block mt-0.5">{getReportCategory(s)} • Mã: {s.ID}</span>
+                        </td>
+                        <td className="py-3 px-3 border border-slate-300 bg-white">
+                          <span className="font-extrabold text-slate-750">{s.Ten_Phong}</span>
+                        </td>
+                        <td className="py-3 px-3 text-center font-mono font-black text-slate-650 border border-slate-300 bg-white">{s.Han_Nop}</td>
+                        <td className="py-3 px-3 text-center font-mono font-black text-slate-800 border border-slate-300 bg-slate-50">
+                          {s.Ngay_Nop || <span className="text-slate-400 font-normal italic">Chưa nộp</span>}
+                        </td>
+                        <td className="py-3 px-3 text-center border border-slate-300 bg-white">
+                          <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-black border uppercase tracking-wider ${statusClass}`}>
+                            {statusLabel}
                           </span>
-                        ) : (
-                          <span className="text-slate-400">0 ngày</span>
-                        )}
-                      </td>
-                      <td className="py-3.5 px-4 text-center border-l border-slate-100">
-                        <span className="font-mono font-black text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded text-[11px]">
-                          {t.Diem_Thi_Dua_Phan_Tram}%
-                        </span>
-                      </td>
-                    </tr>
-                  ))
+                        </td>
+                        <td className="py-3 px-3 text-center font-mono bg-sky-50/30 text-sky-850 font-black border border-slate-300">
+                          {s.Diem_Thoi_Gian !== null ? s.Diem_Thoi_Gian : '-'}
+                        </td>
+                        <td className="py-3 px-3 text-center font-mono bg-indigo-50/20 text-slate-850 font-black border border-slate-300">
+                          {s.Diem_Chat_Luong !== null ? s.Diem_Chat_Luong : (s.Ngay_Nop ? <span className="text-sky-700 italic">Chờ chấm</span> : '-')}
+                        </td>
+                        <td className="py-3 px-4 text-center font-mono bg-indigo-50 text-indigo-950 font-black border border-slate-300">
+                          <div className="text-xs font-black">{s.Tong_Diem !== null ? s.Tong_Diem : '-'}</div>
+                          <span className="text-[9px] text-slate-500 font-extrabold block mt-0.5 leading-none">ĐM: {s.Diem_Dinh_Muc}</span>
+                        </td>
+                      </tr>
+                    );
+                  })
                 ) : (
                   <tr>
-                    <td colSpan={11} className="py-8 text-center text-slate-400">Không tìm thấy loại báo cáo phù hợp</td>
+                    <td colSpan={10} className="py-12 text-center text-slate-500 font-extrabold font-sans border border-slate-300">
+                      Không tìm thấy báo cáo nào khớp điều kiện lọc theo dõi báo cáo!
+                    </td>
                   </tr>
                 )}
               </tbody>
             </table>
           </div>
         )}
+
       </div>
 
-      {/* FOOTER GENERAL INFO BOX */}
-      <div className="bg-slate-50 border border-slate-200/60 p-4.5 rounded-2xl flex items-start gap-3 text-left">
-        <div className="p-2 bg-slate-200 text-slate-600 rounded-xl mt-0.5">
-          <Star className="w-4 h-4 text-slate-600" />
+      {/* SOLID PROFESSIONAL ADVICE BOARD */}
+      <div className="bg-slate-50 border border-slate-300 p-5 rounded-2xl flex items-start gap-4 text-left">
+        <div className="p-2.5 bg-indigo-100 text-indigo-805 rounded-xl mt-0.5 shadow-2xs border border-indigo-200">
+          <Star className="w-5 h-5 text-indigo-700" />
         </div>
-        <div className="space-y-1">
-          <h5 className="font-bold text-slate-700 text-xs">Cơ chế tự xếp hạng và dồn chỉ tiêu liên kết</h5>
-          <p className="text-[11px] text-slate-500 leading-relaxed font-sans">
-            Các điểm số chỉ tiêu được liên kết song song. Trình Excel chi tiết 8 cột được cấu hình đồng bộ trực tiếp với hệ dữ liệu dán và truyền tệp xlsx, giúp việc quản trị số liệu và đồng bộ hóa báo cáo trở nên linh hoạt nhất có thể.
+        <div className="space-y-1 flex-1">
+          <h5 className="font-extrabold text-slate-900 text-sm tracking-tight uppercase leading-snug">Phân Lớp & Thống Kê Theo Quy Trình Chất Lượng</h5>
+          <p className="text-xs text-slate-650 leading-relaxed font-medium">
+            Mọi chỉ số tổng kết tại bảng thi đua đều được bóc tách theo phòng ban chuyên môn chỉ định hoặc loại tệp báo cáo nhanh/báo cáo phân tích giúp quá trình bình xét điểm số diễn ra minh bạch, rõ ràng thông số. Quyết định phê duyệt thuộc quyền hạn tối cao của Cục Thống kê Tỉnh Hưng Yên.
           </p>
         </div>
       </div>

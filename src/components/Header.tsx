@@ -124,7 +124,12 @@ export default function Header({
   ] as const;
 
   const tabs = rawTabs.filter(tab => {
-    if (currentUser?.role === 'tkcs' && (tab.id === 'importer' || tab.id === 'accounts')) return false;
+    if (tab.id === 'importer' && !currentUser?.permissions?.includes('upload_excel')) {
+      return false;
+    }
+    if (tab.id === 'accounts' && !currentUser?.permissions?.includes('manage_accounts')) {
+      return false;
+    }
     return true;
   });
 
@@ -197,17 +202,17 @@ export default function Header({
               </div>
               <div className="text-left">
                 <div className="flex items-center space-x-2">
-                  <span className="text-[10px] text-white font-sans tracking-wide font-extrabold uppercase bg-gradient-to-r from-red-600 via-blue-600 to-indigo-700 px-2.5 py-0.5 rounded-full shadow-sm">
+                  <span className="text-[10px] text-white font-sans tracking-wide font-bold uppercase bg-gradient-to-r from-red-600 via-blue-600 to-indigo-700 px-2.5 py-0.5 rounded-full shadow-sm">
                     Thống kê Tỉnh Hưng Yên
                   </span>
                   <span className="text-[9px] font-semibold text-sky-600 bg-sky-50 px-1.5 py-0.5 rounded flex items-center gap-0.5 border border-sky-150">
                     <Sparkles className="w-2.5 h-2.5 animate-spin" /> Phiên bản 2026
                   </span>
                 </div>
-                <h1 className="text-md sm:text-2xl font-black tracking-tight font-sans text-slate-900 mt-1" id="app-title-header">
+                <h1 className="text-md sm:text-2xl font-bold tracking-tight font-sans text-slate-900 mt-1" id="app-title-header">
                   HỆ THỐNG QUẢN LÝ & CHẤM ĐIỂM THI ĐUA BÁO CÁO THỐNG KÊ
                 </h1>
-                <p className="text-[11.5px] text-slate-800 font-extrabold font-sans mt-1">
+                <p className="text-[11.5px] text-slate-600 font-medium font-sans mt-1">
                   Vietnam Statistics System — Kênh quản lý nộp báo cáo chuyên môn nghiệp vụ tự động.
                 </p>
               </div>
@@ -243,20 +248,13 @@ export default function Header({
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as any)}
                   id={`tab-nav-${tab.id}`}
-                  className={`flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl font-sans text-xs transition-all relative overflow-hidden shrink-0 cursor-pointer whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-sky-500/40 ${
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-sans text-xs transition-all relative overflow-hidden shrink-0 cursor-pointer whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-sky-500/40 border ${
                     isActive 
-                      ? 'bg-sky-50 text-sky-800 font-extrabold shadow-sm border border-sky-100/90' 
-                      : 'text-slate-700 hover:text-slate-950 font-bold hover:bg-slate-100/70'
+                      ? 'bg-indigo-700 text-white font-bold shadow-sm border-indigo-800' 
+                      : 'text-slate-700 hover:text-indigo-950 font-semibold bg-slate-50 border-slate-300 hover:bg-slate-100 hover:shadow-xs'
                   }`}
                 >
-                  {isActive && (
-                    <motion.div 
-                      layoutId="active-nav-indicator"
-                      className="absolute bottom-0 inset-x-0 h-0.5 bg-sky-500"
-                      transition={{ type: 'spring', stiffness: 350, damping: 30 }}
-                    />
-                  )}
-                  <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-sky-700' : 'text-slate-600'}`} />
+                  <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-600'}`} />
                   <span>{tab.label}</span>
                 </button>
               );

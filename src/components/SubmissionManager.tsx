@@ -121,7 +121,7 @@ export default function SubmissionManager({
         Nhan_Xet: `Được giao bổ sung đồng loạt bởi cán bộ quản trị tỉnh.`
       });
     });
-    alert(`Giao chỉ tiêu báo cáo đồng loạt tới 14 Chi cục Thống kê cấp huyện thành công!`);
+    alert(`Giao chỉ tiêu báo cáo đồng loạt tới 14 Đơn vị Thống kê thành công!`);
     setNewReportTitle('');
     setIsDeptManuallySelected(false);
     setShowAllUnitsAssignConfirm(false);
@@ -330,17 +330,17 @@ export default function SubmissionManager({
         {/* Master Log Table list */}
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse table-auto text-xs">
+            <table className="w-full text-left border border-slate-300 table-auto text-xs">
               <thead>
-                <tr className="bg-slate-50/70 border-b border-slate-100 text-[10px] font-mono text-slate-400 font-bold uppercase tracking-wider">
-                  <th className="py-4 px-5">Báo cáo chỉ tiêu</th>
-                  <th className="py-4 px-4 min-w-[150px]">Đơn vị nộp</th>
-                  <th className="py-4 px-3 text-center">Phòng</th>
-                  <th className="py-4 px-3 text-center">Hạn Nộp</th>
-                  <th className="py-4 px-3 text-center">Ngày thực tế</th>
-                  <th className="py-4 px-3 text-center">Định Mức</th>
-                  <th className="py-4 px-3 text-center">Tổng Điểm</th>
-                  <th className="py-4 px-5 text-center w-20">Lựa chọn</th>
+                <tr className="bg-slate-100 border-b border-slate-300 text-xs font-sans text-slate-700 font-semibold normal-case">
+                  <th className="py-3 px-4 border border-slate-300 font-semibold">Báo cáo chỉ tiêu</th>
+                  <th className="py-3 px-4 min-w-[150px] border border-slate-300 font-semibold">Đơn vị nộp</th>
+                  <th className="py-3 px-3 text-center border border-slate-300 font-semibold">Phòng</th>
+                  <th className="py-3 px-3 text-center border border-slate-300 font-semibold">Hạn nộp</th>
+                  <th className="py-3 px-3 text-center border border-slate-300 font-semibold">Ngày thực tế</th>
+                  <th className="py-3 px-3 text-center border border-slate-300 font-semibold">Định mức</th>
+                  <th className="py-3 px-3 text-center border border-slate-300 font-semibold">Tổng điểm</th>
+                  <th className="py-3 px-4 text-center w-20 border border-slate-300 font-semibold">Lựa chọn</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -358,7 +358,7 @@ export default function SubmissionManager({
                       <tr key={row.ID} className="hover:bg-slate-50/50 transition-colors duration-100">
                         
                         {/* Report description */}
-                        <td className="py-4 px-5">
+                        <td className="py-4 px-5 border border-slate-300">
                           <div className="flex flex-col">
                             <span className="font-bold text-xs text-slate-700 leading-normal">{row.Ten_Bao_Cao}</span>
                             <span className="text-[10px] text-slate-400 font-sans mt-0.5">Loại kỳ hạn: {row.Loai_BC}</span>
@@ -366,7 +366,7 @@ export default function SubmissionManager({
                         </td>
 
                         {/* Unit name */}
-                        <td className="py-4 px-4">
+                        <td className="py-4 px-4 border border-slate-300">
                           <div className="flex flex-col">
                             <span className="font-medium text-slate-700 text-xs">{row.Ten_Don_Vi}</span>
                             <span className="text-[10px] text-slate-400 font-sans mt-0.5">{row.Vung} (Mã: {row.Ma_DV})</span>
@@ -374,17 +374,17 @@ export default function SubmissionManager({
                         </td>
 
                         {/* Department code */}
-                        <td className="py-4 px-3 text-center text-slate-500 font-medium">
+                        <td className="py-4 px-3 text-center text-slate-500 font-medium border border-slate-300">
                           {row.Ma_Phong}
                         </td>
 
                         {/* Deadline Date */}
-                        <td className="py-4 px-3 text-center font-mono text-slate-600">
+                        <td className="py-4 px-3 text-center font-mono text-slate-600 border border-slate-300">
                           {new Date(row.Han_Nop).toLocaleDateString('vi-VN')}
                         </td>
 
                         {/* Submission status and actual date */}
-                        <td className="py-4 px-3 text-center">
+                        <td className="py-4 px-3 text-center border border-slate-300">
                           {row.Ngay_Nop ? (
                             <div className="flex flex-col items-center">
                               <span className="font-mono font-semibold text-slate-800">
@@ -411,12 +411,12 @@ export default function SubmissionManager({
                         </td>
 
                         {/* Benchmark Max Points */}
-                        <td className="py-4 px-3 text-center font-mono text-slate-500">
+                        <td className="py-4 px-3 text-center font-mono text-slate-500 border border-slate-300">
                           {row.Diem_Dinh_Muc}
                         </td>
 
                         {/* Evaluated Total Points */}
-                        <td className="py-4 px-3 text-center">
+                        <td className="py-4 px-3 text-center border border-slate-300">
                           {row.Tong_Diem !== null ? (
                             <span className="font-mono font-extrabold text-slate-800 bg-slate-100 px-2 py-1 rounded-md text-xs">
                               {row.Tong_Diem}
@@ -427,7 +427,7 @@ export default function SubmissionManager({
                         </td>
 
                          {/* Actions score edit button */}
-                        <td className="py-4 px-5 text-center font-sans">
+                        <td className="py-4 px-5 text-center font-sans border border-slate-300">
                           {isTkcs ? (
                             row.Ngay_Nop ? (
                               <button 
@@ -1010,7 +1010,7 @@ export default function SubmissionManager({
             </div>
             <div className="p-5 space-y-4 font-sans text-xs text-left">
               <p className="text-slate-600 leading-relaxed font-semibold">
-                Hệ thống ghi nhận bạn đang yêu cầu phân công đồng loạt báo cáo sau cho <strong className="text-sky-600">tất cả 14 Chi cục Thống kê cấp huyện</strong>:
+                Hệ thống ghi nhận bạn đang yêu cầu phân công đồng loạt báo cáo sau cho <strong className="text-sky-600">tất cả 14 Đơn vị Thống kê</strong>:
               </p>
               <div className="p-3 bg-sky-50 border border-sky-100 text-sky-900 rounded-xl space-y-1">
                 <div>

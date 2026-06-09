@@ -113,6 +113,63 @@ export default function App() {
         if (parsed.length <= 1) {
           throw new Error('Migrating accounts layout');
         }
+
+        const OLD_TO_NEW_MAP: Record<string, { code: string; name: string }> = {
+          dv_01: { code: 'TKPH', name: 'Thống kê Cơ Sở Phố Hiến' },
+          dv_02: { code: 'TKNQ', name: 'Thống kê Cơ Sở Như Quỳnh' },
+          dv_03: { code: 'TKYM', name: 'Thống kê Cơ Sở Yên Mỹ' },
+          dv_04: { code: 'TKMH', name: 'Thống kê Cơ Sở Mỹ Hào' },
+          dv_05: { code: 'TKKC', name: 'Thống kê Cơ Sở Khoái Châu' },
+          dv_06: { code: 'TKLB', name: 'Thống kê Cơ Sở Lương Bằng' },
+          dv_07: { code: 'TKHHT', name: 'Thống kê Cơ Sở Hoàng Hoa Thám' },
+          dv_08: { code: 'TKQP', name: 'Thống kê Cơ Sở Quỳnh Phụ' },
+          dv_09: { code: 'TKHH', name: 'Thống kê Cơ Sở Hưng Hà' },
+          dv_10: { code: 'TKDH', name: 'Thống kê Cơ Sở Đông Hưng' },
+          dv_11: { code: 'TKTT', name: 'Thống kê Cơ Sở Thái Thụy' },
+          dv_12: { code: 'TKTH', name: 'Thống kê Cơ Sở Tiền Hải' },
+          dv_13: { code: 'TKKX', name: 'Thống kê Cơ Sở Kiến Xương' },
+          dv_14: { code: 'TKVT', name: 'Thống kê Cơ Sở Vũ Thư' }
+        };
+
+        let hasChange = false;
+        const migrated = parsed.map((acc: User) => {
+          const normUser = acc.username.toLowerCase();
+          if (OLD_TO_NEW_MAP[normUser]) {
+            hasChange = true;
+            const info = OLD_TO_NEW_MAP[normUser];
+            return {
+              ...acc,
+              username: info.code.toLowerCase(),
+              unitCode: info.code,
+              displayName: info.name
+            };
+          }
+          if (acc.unitCode && OLD_TO_NEW_MAP[acc.unitCode.toLowerCase()]) {
+            hasChange = true;
+            const info = OLD_TO_NEW_MAP[acc.unitCode.toLowerCase()];
+            return {
+              ...acc,
+              username: info.code.toLowerCase(),
+              unitCode: info.code,
+              displayName: info.name
+            };
+          }
+          const matchUnit = UNITS_DATA.find(u => u.Ma_DV === acc.unitCode);
+          if (matchUnit && acc.displayName !== matchUnit.Ten_Don_Vi) {
+            hasChange = true;
+            return {
+              ...acc,
+              displayName: matchUnit.Ten_Don_Vi
+            };
+          }
+          return acc;
+        });
+
+        if (hasChange) {
+          localStorage.setItem('emulation_users', JSON.stringify(migrated));
+          return migrated;
+        }
+
         return parsed;
       } catch (e) {}
     }
@@ -160,6 +217,7 @@ export default function App() {
   const handleLoginSuccess = (user: User) => {
     setCurrentUser(user);
     localStorage.setItem('emulation_user', JSON.stringify(user));
+    setActiveTab('dashboard');
   };
 
   const handleLogout = () => {
@@ -244,7 +302,7 @@ export default function App() {
     setSubmissions(fresh);
     localStorage.setItem('emulation_submissions', JSON.stringify(fresh));
     localStorage.setItem('emulation_schema_version', 'v2');
-    alert('Đã khôi phục thành công danh sách điểm thi đua và tiến độ mặc định của 14 đơn vị thống kê cấp huyện!');
+    alert('Đã khôi phục thành công danh sách điểm thi đua và tiến độ mặc định của 14 đơn vị thống kê!');
   };
 
   const handleClearAllSubmissions = () => {
@@ -474,7 +532,7 @@ export default function App() {
   };
 
   if (currentUser === null) {
-    return <Login onLoginSuccess={handleLoginSuccess} units={UNITS_DATA} />;
+    return <Login onLoginSuccess={handleLoginSuccess} units={UNITS_DATA} accounts={accounts} />;
   }
 
   return (

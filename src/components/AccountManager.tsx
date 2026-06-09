@@ -205,7 +205,7 @@ export default function AccountManager({
               <Users className="w-5 h-5 text-sky-200" /> PHÂN QUYỀN TÀI KHOẢN NGƯỜI DÙNG & NGƯỜI CHẤM
             </h3>
             <p className="text-[11px] text-indigo-50 leading-relaxed font-sans">
-              Công cụ Quản lý Hệ thống: Thiết lập tài khoản riêng biệt cho các cán bộ phụ trách thi đua (Quyền giám khảo/Người chấm) và đại diện các Chi cục Thống kê cấp huyện (đơn vị báo cáo). Cấp hoặc thu hồi các quyền truy cập, đặt lại khóa mật khẩu nhanh chóng.
+              Công cụ Quản lý Hệ thống: Thiết lập tài khoản riêng biệt cho các cán bộ phụ trách thi đua (Quyền giám khảo/Người chấm) và đại diện các Đơn vị Thống kê (đơn vị báo cáo). Cấp hoặc thu hồi các quyền truy cập, đặt lại khóa mật khẩu nhanh chóng.
             </p>
           </div>
           <div className="flex gap-2">
@@ -255,8 +255,8 @@ export default function AccountManager({
                   <Download className="w-4 h-4 text-emerald-600 shrink-0" />
                   <span className="text-xs font-extrabold text-slate-900">Xuất Excel Toàn Hệ Thống</span>
                 </div>
-                <p className="text-[11px] text-slate-650 leading-relaxed font-sans font-medium">
-                  Tải xuống tất cả chi tiết giao, trạng thái nộp, điểm và xếp hạng thi đua của 14 đơn vị thống kê cấp huyện sang tệp Excel đa trang tự quản lý.
+                <p className="text-[11px] text-slate-655 leading-relaxed font-sans font-medium">
+                  Tải xuống tất cả chi tiết giao, trạng thái nộp, điểm và xếp hạng thi đua của 14 đơn vị thống kê sang tệp Excel đa trang tự quản lý.
                 </p>
               </div>
               <div>
@@ -279,7 +279,7 @@ export default function AccountManager({
                   <span className="text-xs font-extrabold text-slate-900">Khôi phục Dữ liệu Mẫu</span>
                 </div>
                 <p className="text-[11px] text-slate-650 leading-relaxed font-sans font-medium">
-                  Hạ nạp lại danh sách báo cáo chỉ tiêu và trạng thái điểm mặc định ban đầu của 14 đơn vị huyện. Toàn bộ tiến độ hiện tại sẽ bị đảo ngược.
+                  Hạ nạp lại danh sách báo cáo chỉ tiêu và trạng thái điểm mặc định ban đầu của 14 đơn vị. Toàn bộ tiến độ hiện tại sẽ bị đảo ngược.
                 </p>
               </div>
               <div>
@@ -515,7 +515,7 @@ export default function AccountManager({
                       - <span className="font-semibold">Quản trị tối cao (Admin)</span>: Có toàn quyền cài đặt tài khoản và kiểm soát tất cả báo cáo.
                     </p>
                     <p>
-                      - <span className="font-semibold">Cán bộ Phòng ban</span>: Xem, chấm điểm, sửa và chỉ định báo cáo cho các huyện theo Phòng phụ trách.
+                      - <span className="font-semibold">Cán bộ Phòng ban</span>: Xem, chấm điểm, sửa và chỉ định báo cáo cho các Đơn vị Thống kê theo Phòng phụ trách.
                     </p>
                     <p>
                       - <span className="font-semibold">Đơn vị báo cáo (TKCS)</span>: Chỉ được xem tổng quan, nộp tờ trình báo cáo đúng thời hạn quy định.
