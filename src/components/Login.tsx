@@ -110,10 +110,14 @@ export default function Login({ onLoginSuccess, units, accounts }: LoginProps) {
         <div className="flex flex-col items-center text-center">
           <div className="mb-4">
             <img 
-              src="/logo.png" 
+              src="/ten-file-logo-cua-ban.png" 
               alt="Logo" 
-              className="h-16 w-16 object-contain"
+              className="h-16 w-16 object-contain" 
+            />
           </div>
+          <span className="text-[10px] text-sky-600 uppercase tracking-widest font-extrabold bg-sky-50 border border-sky-150 px-3 py-1 rounded-full font-sans">
+            Thống kê Tỉnh Hưng Yên
+          </span>
           <span className="text-[10px] text-sky-600 uppercase tracking-widest font-extrabold bg-sky-50 border border-sky-150 px-3 py-1 rounded-full font-sans">
             Thống kê Tỉnh Hưng Yên
           </span>
