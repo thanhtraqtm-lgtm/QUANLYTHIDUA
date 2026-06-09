@@ -123,7 +123,7 @@ export default function StatsDashboard({
           <div className="flex items-center space-x-3 text-amber-800">
             <AlertCircle className="w-5 h-5 text-amber-500 shrink-0" />
             <span className="text-xs font-sans leading-relaxed">
-              <strong>Chiến dịch Thi đua mới:</strong> Hệ thống hiện có <strong>{totalReportsCount}</strong> chỉ tiêu báo cáo chuẩn nhưng chưa ghi nhận dữ liệu nộp thực tế. Bạn có muốn <strong>phát sinh dữ liệu nộp mẫu tự động</strong> để kiểm thử ngay các bảng số liệu, biểu đồ và bảng xếp hạng thi đua?
+              <strong>Kế Hoạch Công Tác năm 2026 :</strong> Hệ thống hiện có <strong>{totalReportsCount}</strong> chỉ tiêu báo cáo chuẩn nhưng chưa ghi nhận dữ liệu nộp thực tế. Bạn có muốn <strong>phát sinh dữ liệu nộp mẫu tự động</strong> để kiểm thử ngay các bảng số liệu, biểu đồ và bảng xếp hạng thi đua?
             </span>
           </div>
           <button
@@ -247,7 +247,7 @@ export default function StatsDashboard({
               </span>
             </div>
             <p className="text-xs text-slate-500 font-sans leading-relaxed mb-6">
-              Đối chiếu điểm hiệu suất bình quân (Diem_Thi_Dua) và tổng số lượng hoàn thành giao vận chỉ tiêu báo cáo giữa hai vùng trọng điểm.
+              Đối chiếu điểm hiệu suất bình quân (Diem_Thi_Dua) và tổng số lượng hoàn thành các báo cáo giữa hai vùng trọng điểm.
             </p>
           </div>
 
