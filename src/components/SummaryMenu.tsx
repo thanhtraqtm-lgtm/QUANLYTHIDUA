@@ -740,7 +740,7 @@ export default function SummaryMenu({ submissions, departments, units }: Summary
         <div className="space-y-1 flex-1">
           <h5 className="font-extrabold text-slate-900 text-sm tracking-tight uppercase leading-snug">Phân Lớp & Thống Kê Theo Quy Trình Chất Lượng</h5>
           <p className="text-xs text-slate-650 leading-relaxed font-medium">
-            Mọi chỉ số tổng kết tại bảng thi đua đều được bóc tách theo phòng ban chuyên môn chỉ định hoặc loại tệp báo cáo nhanh/báo cáo phân tích giúp quá trình bình xét điểm số diễn ra minh bạch, rõ ràng thông số. Quyết định phê duyệt thuộc quyền hạn tối cao của Cục Thống kê Tỉnh Hưng Yên.
+            Mọi chỉ số tổng kết tại bảng thi đua đều được bóc tách theo phòng ban chuyên môn chỉ định hoặc loại tệp báo cáo nhanh/báo cáo phân tích giúp quá trình bình xét điểm số diễn ra minh bạch, rõ ràng. Quyết định phê duyệt thuộc quyền hạn Thống kê Tỉnh Hưng Yên.
           </p>
         </div>
       </div>
